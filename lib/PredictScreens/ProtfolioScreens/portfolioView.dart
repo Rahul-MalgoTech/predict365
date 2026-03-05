@@ -37,9 +37,9 @@ class PortfolioScreen extends StatelessWidget {
                     left: 0,
                     right: 0,
                     child: Container(
-                      height: 1,
-                      color: Colors.grey.shade200,
-                    ),
+                      height: 1.2,
+                      color: Colors.grey,
+                    )
                   ),
 
                   TabBar(
@@ -47,7 +47,7 @@ class PortfolioScreen extends StatelessWidget {
                     indicator: BoxDecoration(
                       border: Border(
                         bottom: BorderSide(
-                          color: theme.colorScheme.surfaceBright,
+                          color: theme.colorScheme.surfaceBright.withOpacity(0.6),
                           width: 2,
                         ),
                       ),
@@ -93,7 +93,9 @@ class PortfolioScreen extends StatelessWidget {
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(20),
-              color: theme.primaryColorDark
+              color: theme.primaryColorDark,
+              border: Border.all(color: theme.dividerColor)
+
             ),
 
             child: Row(
@@ -105,7 +107,7 @@ class PortfolioScreen extends StatelessWidget {
                   children:  [
                     AppText(
                       "Total Investment",
-                      color: Colors.white70,
+                      color: Colors.grey,
                     ),
 
                     SizedBox(height: 6),
@@ -113,7 +115,7 @@ class PortfolioScreen extends StatelessWidget {
                     AppText(
                       "₹0.00",
 
-                        color: Colors.white,
+
                         fontSize: 26,
                         fontWeight: FontWeight.bold,
 
@@ -126,7 +128,7 @@ class PortfolioScreen extends StatelessWidget {
                 Container(
                   height: 40,
                   width: 1,
-                  color: Colors.white70,
+                  color: Colors.grey,
                 ),
 
                 const Spacer(),
@@ -137,7 +139,7 @@ class PortfolioScreen extends StatelessWidget {
                   children:  [
                     AppText(
                       "Current Value",
-               color: Colors.white70,
+                      color: Colors.grey,
                     ),
 
                     SizedBox(height: 6),
@@ -147,14 +149,14 @@ class PortfolioScreen extends StatelessWidget {
                         AppText(
                           "₹0.00",
 
-                            color: Colors.white,
+
                             fontSize: 22,
                             fontWeight: FontWeight.bold,
 
                         ),
                         SizedBox(width: 4),
                         Icon(Icons.arrow_upward,
-                            size: 16, color: Colors.white),
+                            size: 16, color: theme.colorScheme.surfaceBright),
                       ],
                     ),
 
@@ -162,7 +164,7 @@ class PortfolioScreen extends StatelessWidget {
 
                     AppText(
                       "Returns: +₹0.00",
-                      color: Colors.white,
+                      color: Colors.grey,
                     ),
                   ],
                 ),
@@ -233,11 +235,166 @@ class PortfolioScreen extends StatelessWidget {
 
 
   Widget _closedTrades(BuildContext context) {
-    return  Center(
-      child: AppText(
-        "No closed trades",
-    fontSize: 16,
-      ),
+    final theme = Theme.of(context);
+
+    return Column(
+      children: [
+
+        /// GRADIENT CARD
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(20),
+            color: theme.primaryColorDark,
+              border: Border.all(color: theme.dividerColor)
+            ),
+
+            child: Column(
+              children: [
+
+                /// TOP SECTION
+                Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Row(
+                    children: [
+
+                      /// LEFT
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children:  [
+                          AppText(
+                            "Total Investment",
+                          color: Colors.grey,
+                          ),
+
+                          SizedBox(height: 6),
+
+                          AppText(
+                            "₹0.00",
+                            fontSize: 26,
+                            fontWeight: FontWeight.bold,
+
+
+                          ),
+                        ],
+                      ),
+
+                      const Spacer(),
+
+                      Container(
+                        height: 40,
+                        width: 1,
+                        color: Colors.grey,
+                      ),
+
+                      const Spacer(),
+
+                      /// RIGHT
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                           AppText(
+                            "Total Returns",
+                             color: Colors.grey,
+                          ),
+
+                          const SizedBox(height: 6),
+
+                          Row(
+                            children:  [
+                              AppText(
+                                "₹0.00",
+                                fontSize: 22,
+                                fontWeight: FontWeight.bold,
+
+                              ),
+                              SizedBox(width: 4),
+                              Icon(Icons.arrow_upward,
+                                  size: 16, ),
+                            ],
+                          ),
+
+                          const SizedBox(height: 4),
+
+                           AppText(
+                            "Returns: +₹0.00",
+                             color: Colors.grey,
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+
+
+                Container(
+                  width: double.infinity,
+                  padding:
+                  const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                  decoration: BoxDecoration(
+                    color: Colors.black.withOpacity(.1),
+                    borderRadius: const BorderRadius.vertical(
+                      bottom: Radius.circular(20),
+                    ),
+                  ),
+
+                  child: Row(
+                    children:  [
+
+
+                      AppText(
+                        "Today",
+
+                        fontWeight: FontWeight.w600,
+                      ),
+
+                      SizedBox(width: 10),
+
+                      AppText(
+                        "Investment: ",
+                        color: Colors.grey,
+                      ),
+                      AppText(
+                        "₹0.00",
+
+                      ),
+                      SizedBox(width: 6),
+
+                      AppText(
+                        "•",
+
+                      ),
+
+                      SizedBox(width: 6),
+
+                      AppText(
+                        "Returns: ",
+                        color: Colors.grey,
+                      ),
+                      AppText(
+                        "₹0.00",
+
+                      ),
+                    ],
+                  ),
+                )
+              ],
+            ),
+          ),
+        ),
+
+        const SizedBox(height: 80),
+
+        /// EMPTY STATE
+        Center(
+          child: AppText(
+            "No closed trades found",
+            fontSize: 16,
+            color: Colors.grey,
+          ),
+        ),
+      ],
     );
   }
 }

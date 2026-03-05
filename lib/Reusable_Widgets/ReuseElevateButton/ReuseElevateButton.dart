@@ -44,7 +44,7 @@ class ReuseElevatedButton extends StatelessWidget {
         height: height ?? 55,
         width: width ?? MediaQuery.of(context).size.width * 0.85,
         decoration: BoxDecoration(
-          borderRadius: borderRadius ?? BorderRadius.circular(4),
+          borderRadius: borderRadius ?? BorderRadius.circular(14),
           border: Border.all(
             color: Theme.of(context).canvasColor,
             width: borderWidth ?? 0,

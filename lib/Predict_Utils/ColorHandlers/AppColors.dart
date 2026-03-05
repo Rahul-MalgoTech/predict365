@@ -31,7 +31,7 @@ class AppColors {
 
 final Color greyContainerLight = Colors.white;
  final Color iconColorLight = Color(0XFF4a5565);
-  final Color appPrimaryColorLight = Colors.white.withOpacity(0.9);
+  final Color appPrimaryColorLight = Colors.white.withOpacity(0.85);
   final Color container = Color(0XFF153491);
   final Color appBodyColorLight1 =  Color(0XFfffefee);
   final Color appBodyColorLight2 = Colors.white;

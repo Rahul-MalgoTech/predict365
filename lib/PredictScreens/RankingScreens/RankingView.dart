@@ -326,7 +326,7 @@ class FilterItem extends StatelessWidget {
         ? GradientContainer(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
             margin: const EdgeInsets.symmetric(horizontal: 2),
-            child: AppText(text, fontSize: 12),
+            child: AppText(text, fontSize: 12,color: Colors.white,),
           )
         : Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),

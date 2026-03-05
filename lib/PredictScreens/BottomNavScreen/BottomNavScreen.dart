@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:predict365/PredictScreens/HomeScreens/HomeView.dart';
+import 'package:predict365/PredictScreens/ProfileScreens/profileView.dart';
 import 'package:predict365/PredictScreens/ProtfolioScreens/portfolioView.dart';
 import 'package:predict365/PredictScreens/RankingScreens/RankingView.dart';
+import 'package:predict365/PredictScreens/ReferralScreens/RefferalView.dart';
+import 'package:predict365/Reusable_Widgets/AppText_Theme/AppText_Theme.dart';
 
 
 class MainNavigationPage extends StatefulWidget {
@@ -18,9 +21,9 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
   final pages = [
     const HomeScreen(),
     const RankingScreen(),
-    const HomeScreen(),
+    const ReferEarnScreen(),
     const PortfolioScreen(),
-    const HomeScreen(),
+    const ProfileScreen(),
   ];
 
   @override
@@ -73,18 +76,18 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
             icon,
             height: 24,
             width: 24,
-            color: isSelected ? Theme.of(context).colorScheme.surfaceBright : Colors.grey,
+            color: isSelected ? Theme.of(context).colorScheme.surfaceBright : Colors.grey.shade600,
           ),
 
           const SizedBox(height: 5),
 
-          Text(
+          AppText(
             title,
-            style: TextStyle(
-              fontSize: 12,
-              color: isSelected ? Theme.of(context).colorScheme.surfaceBright : Colors.grey,
+
+              fontSize: 13,
+              color: isSelected ? Theme.of(context).colorScheme.surfaceBright : Colors.grey.shade600,
               fontWeight: FontWeight.w500,
-            ),
+
           )
 
         ],

@@ -5,109 +5,18 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ef881180-111e-4c11-9554-3295fb13d7a5" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/assets/fonts/Inter/Inter-Italic-VariableFont_opsz,wght.ttf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/fonts/Inter/Inter-VariableFont_opsz,wght.ttf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/fonts/Inter/OFL.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/fonts/Inter/README.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/fonts/Inter/static/Inter_18pt-Black.ttf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/fonts/Inter/static/Inter_18pt-BlackItalic.ttf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/fonts/Inter/static/Inter_18pt-Bold.ttf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/fonts/Inter/static/Inter_18pt-BoldItalic.ttf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/fonts/Inter/static/Inter_18pt-ExtraBold.ttf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/fonts/Inter/static/Inter_18pt-ExtraBoldItalic.ttf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/fonts/Inter/static/Inter_18pt-ExtraLight.ttf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/fonts/Inter/static/Inter_18pt-ExtraLightItalic.ttf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/fonts/Inter/static/Inter_18pt-Italic.ttf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/fonts/Inter/static/Inter_18pt-Light.ttf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/fonts/Inter/static/Inter_18pt-LightItalic.ttf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/fonts/Inter/static/Inter_18pt-Medium.ttf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/fonts/Inter/static/Inter_18pt-MediumItalic.ttf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/fonts/Inter/static/Inter_18pt-Regular.ttf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/fonts/Inter/static/Inter_18pt-SemiBold.ttf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/fonts/Inter/static/Inter_18pt-SemiBoldItalic.ttf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/fonts/Inter/static/Inter_18pt-Thin.ttf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/fonts/Inter/static/Inter_18pt-ThinItalic.ttf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/fonts/Inter/static/Inter_24pt-Black.ttf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/fonts/Inter/static/Inter_24pt-BlackItalic.ttf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/fonts/Inter/static/Inter_24pt-Bold.ttf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/fonts/Inter/static/Inter_24pt-BoldItalic.ttf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/fonts/Inter/static/Inter_24pt-ExtraBold.ttf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/fonts/Inter/static/Inter_24pt-ExtraBoldItalic.ttf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/fonts/Inter/static/Inter_24pt-ExtraLight.ttf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/fonts/Inter/static/Inter_24pt-ExtraLightItalic.ttf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/fonts/Inter/static/Inter_24pt-Italic.ttf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/fonts/Inter/static/Inter_24pt-Light.ttf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/fonts/Inter/static/Inter_24pt-LightItalic.ttf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/fonts/Inter/static/Inter_24pt-Medium.ttf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/fonts/Inter/static/Inter_24pt-MediumItalic.ttf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/fonts/Inter/static/Inter_24pt-Regular.ttf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/fonts/Inter/static/Inter_24pt-SemiBold.ttf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/fonts/Inter/static/Inter_24pt-SemiBoldItalic.ttf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/fonts/Inter/static/Inter_24pt-Thin.ttf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/fonts/Inter/static/Inter_24pt-ThinItalic.ttf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/fonts/Inter/static/Inter_28pt-Black.ttf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/fonts/Inter/static/Inter_28pt-BlackItalic.ttf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/fonts/Inter/static/Inter_28pt-Bold.ttf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/fonts/Inter/static/Inter_28pt-BoldItalic.ttf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/fonts/Inter/static/Inter_28pt-ExtraBold.ttf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/fonts/Inter/static/Inter_28pt-ExtraBoldItalic.ttf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/fonts/Inter/static/Inter_28pt-ExtraLight.ttf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/fonts/Inter/static/Inter_28pt-ExtraLightItalic.ttf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/fonts/Inter/static/Inter_28pt-Italic.ttf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/fonts/Inter/static/Inter_28pt-Light.ttf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/fonts/Inter/static/Inter_28pt-LightItalic.ttf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/fonts/Inter/static/Inter_28pt-Medium.ttf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/fonts/Inter/static/Inter_28pt-MediumItalic.ttf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/fonts/Inter/static/Inter_28pt-Regular.ttf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/fonts/Inter/static/Inter_28pt-SemiBold.ttf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/fonts/Inter/static/Inter_28pt-SemiBoldItalic.ttf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/fonts/Inter/static/Inter_28pt-Thin.ttf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/fonts/Inter/static/Inter_28pt-ThinItalic.ttf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/images/africa.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/images/bitcoin.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/images/bronze.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/images/circket.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/images/circketbanner.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/images/england.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/images/game.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/images/gold.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/images/goldmedal.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/images/india.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/images/myprofile.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/images/paircoin.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/images/port.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/images/predicthome.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/images/predictlogo.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/images/predictlogowhite.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/images/profile.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/images/rank.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/images/rank2.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/images/rankingprofile.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/images/refer.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/images/silver.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/images/youtubelogo.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/images/zealand.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/PredictScreens/BottomNavScreen/BottomNavScreen.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/PredictScreens/HomeScreens/HomeView.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/PredictScreens/LoginScreens/LoginView.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/PredictScreens/ProtfolioScreens/portfolioView.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/PredictScreens/RankingScreens/RankingView.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/Reusable_Widgets/ReuseableGradientContainer/ReusableGradientContainer.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.dart_tool/package_config.json" beforeDir="false" afterPath="$PROJECT_DIR$/.dart_tool/package_config.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Dart_Packages.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/libraries/Dart_Packages.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/assets/images/coin.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/assets/images/note.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/assets/images/referfriend.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/lib/PredictScreens/ProfileScreens/profileView.dart" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/lib/PredictScreens/ReferralScreens/RefferalView.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/android/local.properties" beforeDir="false" afterPath="$PROJECT_DIR$/android/local.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ios/Flutter/Generated.xcconfig" beforeDir="false" afterPath="$PROJECT_DIR$/ios/Flutter/Generated.xcconfig" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ios/Flutter/flutter_export_environment.sh" beforeDir="false" afterPath="$PROJECT_DIR$/ios/Flutter/flutter_export_environment.sh" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ios/Runner.xcodeproj/project.pbxproj" beforeDir="false" afterPath="$PROJECT_DIR$/ios/Runner.xcodeproj/project.pbxproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ios/Runner.xcworkspace/contents.xcworkspacedata" beforeDir="false" afterPath="$PROJECT_DIR$/ios/Runner.xcworkspace/contents.xcworkspacedata" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/PredictScreens/BottomNavScreen/BottomNavScreen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/PredictScreens/BottomNavScreen/BottomNavScreen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/PredictScreens/HomeScreens/HomeView.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/PredictScreens/HomeScreens/HomeView.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/PredictScreens/ProtfolioScreens/portfolioView.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/PredictScreens/ProtfolioScreens/portfolioView.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/PredictScreens/RankingScreens/RankingView.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/PredictScreens/RankingScreens/RankingView.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/Predict_Utils/ColorHandlers/AppColors.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Predict_Utils/ColorHandlers/AppColors.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/Predict_Utils/ColorHandlers/Apptheme.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Predict_Utils/ColorHandlers/Apptheme.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/Reusable_Widgets/AppText_Theme/AppText_Theme.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Reusable_Widgets/AppText_Theme/AppText_Theme.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/Reusable_Widgets/BondingNavigator.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Reusable_Widgets/BondingNavigator.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/Reusable_Widgets/Gradient_App_Text/Gradient_AppText.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Reusable_Widgets/Gradient_App_Text/Gradient_AppText.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/main.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/main.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pubspec.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/pubspec.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/Reusable_Widgets/ReuseElevateButton/ReuseElevateButton.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Reusable_Widgets/ReuseElevateButton/ReuseElevateButton.dart" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -147,23 +56,23 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Flutter.main.dart.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.cidr.known.project.marker&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.readMode.enableVisualFormatting&quot;: &quot;true&quot;,
-    &quot;cf.first.check.clang-format&quot;: &quot;false&quot;,
-    &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
-    &quot;dart.analysis.tool.window.visible&quot;: &quot;false&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;io.flutter.reload.alreadyRun&quot;: &quot;true&quot;,
-    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/Users/oridetechnologies/StudioProjects/predict365/assets/images&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
-    &quot;show.migrate.to.gradle.popup&quot;: &quot;false&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Flutter.main.dart.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.cidr.known.project.marker": "true",
+    "RunOnceActivity.readMode.enableVisualFormatting": "true",
+    "cf.first.check.clang-format": "false",
+    "cidr.known.project.marker": "true",
+    "dart.analysis.tool.window.visible": "false",
+    "git-widget-placeholder": "main",
+    "io.flutter.reload.alreadyRun": "true",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "/Users/oridetechnologies/StudioProjects/predict365/assets/images",
+    "settings.editor.selected.configurable": "dart.settings",
+    "show.migrate.to.gradle.popup": "false"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/assets/images" />
@@ -201,19 +110,28 @@
       <option name="project" value="LOCAL" />
       <updated>1772602418177</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="home,rank ui">
+      <option name="closed" value="true" />
+      <created>1772693769201</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1772693769201</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="initial commit" />
-    <option name="LAST_COMMIT_MESSAGE" value="initial commit" />
+    <MESSAGE value="home,rank ui" />
+    <option name="LAST_COMMIT_MESSAGE" value="home,rank ui" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="Dart">
           <url>file://$PROJECT_DIR$/lib/PredictScreens/BottomNavScreen/BottomNavScreen.dart</url>
-          <line>6</line>
+          <line>9</line>
           <option name="timeStamp" value="2" />
         </line-breakpoint>
       </breakpoints>

@@ -299,7 +299,7 @@ class CategoryItem extends StatelessWidget {
 
         color: selected
             ? Theme.of(context).textTheme.labelLarge!.color
-            : Colors.grey,
+            : Colors.grey.shade600,
         fontWeight: selected ? FontWeight.bold : FontWeight.normal,
       ),
     );
@@ -347,7 +347,7 @@ class QuickCard extends StatelessWidget {
             top: -6,
             right: 6,
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 3),
               decoration: BoxDecoration(
                 color: Color(0XFFe53a3b),
                 borderRadius: BorderRadius.circular(6),
@@ -482,7 +482,7 @@ class PredictionCard extends StatelessWidget {
           Row(
             children: [
               /// VOLUME
-              AppText(volume, fontSize: 12, color: Colors.grey),
+              AppText(volume, fontSize: 14, color: Colors.grey),
 
               const Spacer(),
 
@@ -491,7 +491,7 @@ class PredictionCard extends StatelessWidget {
 
               const SizedBox(width: 4),
 
-              AppText(time, fontSize: 12, color: Colors.grey),
+              AppText(time, fontSize: 14, color: Colors.grey),
 
               const SizedBox(width: 10),
 
@@ -625,7 +625,7 @@ class PredictionCardType2 extends StatelessWidget {
             children: [
               AppText(
                 volume,
-                fontSize: 12,
+                fontSize: 14,
                 color: Colors.grey,
               ),
 
