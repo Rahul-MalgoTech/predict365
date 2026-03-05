@@ -42,9 +42,9 @@ class _AppTextState extends State<AppText> {
           TextStyle(
             decoration: widget.decoration,
             color: widget.color ?? Theme.of(context).colorScheme.surfaceBright,
-            fontFamily: 'Manrope',
+            fontFamily: 'Inter',
             fontSize: widget.fontSize,
-            letterSpacing: widget.letterSpacing??-0.7,
+            letterSpacing: widget.letterSpacing??-0.2,
             overflow: widget.overflow,
             fontWeight: widget.fontWeight,
 

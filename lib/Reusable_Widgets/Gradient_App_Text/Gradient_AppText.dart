@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:predict365/Reusable_Widgets/AppText_Theme/AppText_Theme.dart';
 
 class GradientAppText extends StatelessWidget {
   final String text;
@@ -21,21 +22,20 @@ class GradientAppText extends StatelessWidget {
           end: Alignment.bottomRight,
           stops: [0.0, 0.2174, 0.5403, 0.8528],
           colors: [
-            Color(0xFF54d17a),
-            Color(0xFF4ebfbb),
-            Color(0xFF4bade2),
-            Color(0xFF559bff),
+            Color(0xFF985620),
+            Color(0xFFac6d29),
+            Color(0xFFc28533),
+            Color(0xFFd49b3c),
           ],
         ).createShader(bounds);
       },
-      child: Text(
+      child: AppText(
         text,
-        style: TextStyle(
+
           fontSize: fontSize,
           color: Colors.white,
-          fontFamily: 'BricolageGrotesque',
           fontWeight: fontWeight ?? FontWeight.w300,
-        ),
+
       ),
     );
   }

@@ -42,7 +42,7 @@ class Apptheme {
     hoverColor: appColors.userTextLight,
     textTheme: TextTheme(
       labelLarge: TextStyle(
-        color: appColors.textLight,
+        color: Colors.black,
         fontFamily: "LexendDeca",
         fontSize: 18,
         fontWeight: FontWeight.w400,
@@ -142,7 +142,7 @@ class Apptheme {
     fontFamily: "LexendDeca",
     primaryColor: appColors.appPrimartColorDark,
     iconTheme: IconThemeData(color:appColors.iconColorDark,),
-    primaryColorLight: appColors.appBodyColorDark1,
+    primaryColorLight: Color(0XFF2a1916),
     primaryColorDark: appColors.appBodyColorDark2,
     primarySwatch:
         MaterialColor(appColors.darkPrimaryColor, appColors.darkSwatchColor),
@@ -166,7 +166,7 @@ class Apptheme {
         color: Color(0xFF262737)), // Set bottom app bar color to black
     textTheme: TextTheme(
       labelLarge: TextStyle(
-          color: appColors.textDark,
+          color: Colors.white,
           fontFamily: "LexendDeca",
           fontSize: 18,
           fontWeight: FontWeight.w400),

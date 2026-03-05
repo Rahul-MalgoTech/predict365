@@ -27,12 +27,14 @@ class AppColors {
     end: Alignment.bottomRight,
   );
 
+
+
 final Color greyContainerLight = Colors.white;
  final Color iconColorLight = Color(0XFF4a5565);
-  final Color appPrimaryColorLight = Colors.white;
+  final Color appPrimaryColorLight = Colors.white.withOpacity(0.9);
   final Color container = Color(0XFF153491);
-  final Color appBodyColorLight1 =  Colors.white;
-  final Color appBodyColorLight2 = const Color(0xFFf3f4f6);
+  final Color appBodyColorLight1 =  Color(0XFfffefee);
+  final Color appBodyColorLight2 = Colors.white;
   final Color createWalletTextLight1 = const Color(0xFF535454);
   final Color roundedButtonColorLight1 = const Color(0xFF26CD79);
   final Color roundedButtonColorLight2 =  Colors.white;
@@ -40,7 +42,7 @@ final Color greyContainerLight = Colors.white;
   final Color textLight = Colors.black;
   final Color cntTextLight = const Color(0xFF4f6bcc);
   final Color cntTextLight1 = const Color(0xFF1c398e);
-  final Color buttonLightDiableGrey2 = const Color(0XFFf3f4f6);
+  final Color buttonLightDiableGrey2 =  Colors.black.withOpacity(0.08);
   final Color underlineTextLight = const Color(0XFF000000);
   final Color textBlackColorLight = Color(0xFFc7d0d);
   final Color hintTextLight = const Color(0XFFAAB2B8);
@@ -49,7 +51,7 @@ final Color greyContainerLight = Colors.white;
   final Color greyTextLight = const Color(0XFF848C92);
   final Color hintLight = const Color(0xFFD4D4D4);
   final Color blackLight = const Color(0XFF11223E);
-  final Color cardBackgroundLight =  Colors.white;
+  final Color cardBackgroundLight =  Color(0XFFe6f8f1);
   final Color bgTextLight = Colors.black;
   final Color textBlackLight = const Color(0XFF000000);
   final Color errorSanckBarColorLight = Colors.red;
@@ -84,10 +86,10 @@ final Color greyContainerLight = Colors.white;
   final Color greyContainerDark = Color(0XFF364153);
   final Color SwapArrowRoundDark = Color(0XFF202832);
   final Color containerDark = Color(0XFF153491).withOpacity(0.3);
-  final Color appPrimartColorDark = Color(0xFF192233);
+  final Color appPrimartColorDark = Colors.black;
   final Color createWalletTextDark1 = const Color(0xFFB7B7B7);
-  final Color appBodyColorDark1 = const Color(0xFF111829);
-  final Color appBodyColorDark2 = const Color(0xFF1e2938);
+  final Color appBodyColorDark1 = const Color(0xFF1b1d24);
+  final Color appBodyColorDark2 = const Color(0xFF1b1d24);
   final Color roundedButtonColorDark1 = const Color(0xFF26CD79);
   final Color roundedButtonColorDark2 = const Color(0xFF313946);
   final Color buttonDiableGrey2 = Color(0XFF364153);
@@ -97,7 +99,7 @@ final Color greyContainerLight = Colors.white;
   final Color textBlackColorDark = Color(0xFF202832);
   final Color textBlackDark = const Color(0XFF000000);
   final Color hintTextDark = const Color(0XFFAAB2B8);
-  final Color cardBackgroundDark = Color(0xFF1e2938);
+  final Color cardBackgroundDark = Color(0xFF1b2816);
   final Color cardShadowdark = const Color(0xFFc7d0da);
   final Color greyTextDark = const Color(0XFF848C92);
   final Color hintdark = const Color(0xFF202832);

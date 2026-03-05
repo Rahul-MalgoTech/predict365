@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class bondNavigator {
+class predictNavigator {
   static newPage(BuildContext context, {required Widget page}) {
     Navigator.push(context, MaterialPageRoute(builder: (builder) => page));
   }
