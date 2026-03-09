@@ -11,7 +11,7 @@ class Apptheme {
       surfaceBright: appColors.bgTextLight, // Set your background color here
     ),
     appBarTheme: AppBarTheme(
-      backgroundColor: appColors.appPrimaryColorLight,
+      backgroundColor: appColors. appPrimaryColorLight,
     ),
     scaffoldBackgroundColor: appColors.appPrimaryColorLight,
   

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:predict365/PredictScreens/BottomNavScreen/BottomNavScreen.dart';
-import 'package:predict365/PredictScreens/HomeScreens/HomeView.dart';
 import 'package:predict365/Reusable_Widgets/AppText_Theme/AppText_Theme.dart';
 import 'package:predict365/Reusable_Widgets/BondingNavigator.dart';
 import 'package:predict365/Reusable_Widgets/Gradient_App_Text/Gradient_AppText.dart';
@@ -13,166 +12,101 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-
   bool isMobileLogin = true;
+
+  static const _gold1 = Color(0xFF977032);
+  static const _gold2 = Color(0xFFF5A623);
+  static const _borderColor = Color(0xFFE5E5E5);
+  static const _hintColor = Color(0xFFBBBBBB);
 
   @override
   Widget build(BuildContext context) {
+    final sh = MediaQuery.of(context).size.height;
 
     return Scaffold(
       backgroundColor: Colors.white,
       body: Column(
         children: [
 
-          /// TOP IMAGE
+          // ── BANNER IMAGE ──
           Stack(
             children: [
-
-              Padding(
-                padding: const EdgeInsets.only(top: 20.0),
-                child: Image.asset(
-                  "assets/images/circketbanner.png",
-                  width: double.infinity,
-                  height: MediaQuery.of(context).size.height * 0.45,
-                  fit: BoxFit.cover,
-                ),
+              Image.asset(
+                "assets/images/circketbanner.png",
+                width: double.infinity,
+                height: sh * 0.42,
+                fit: BoxFit.cover,
               ),
-
             ],
           ),
 
-          /// BOTTOM SHEET
+          // ── BOTTOM SHEET ──
           Expanded(
             child: Transform.translate(
-              offset: const Offset(0, -10),
+              offset: const Offset(0, -20),
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
+                padding: const EdgeInsets.symmetric(horizontal: 22),
                 decoration: const BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(20),
-                    topRight: Radius.circular(20),
-                  ),
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+                  boxShadow: [
+                    BoxShadow(color: Colors.black12, blurRadius: 12, offset: Offset(0, -4)),
+                  ],
                 ),
-
                 child: SingleChildScrollView(
                   child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
 
-                      const SizedBox(height: 15),
+                      const SizedBox(height: 18),
 
-                      /// TITLE
-                       AppText(
-                        "Log in",
-                        fontSize: 26,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.black,
+                      // ── TITLE ──
+                      Center(
+                        child: AppText(
+                          "Log in",
+                          fontSize: 24,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.black,
+                        ),
                       ),
 
                       const SizedBox(height: 20),
 
-                      /// LOGIN TABS
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-
-                          GestureDetector(
-                            onTap: (){
-                              setState(() {
-                                isMobileLogin = true;
-                              });
-                            },
-                            child: Column(
-                              children: [
-
-                                isMobileLogin
-                                    ? const GradientAppText(
-                                  text: "Mobile Login",
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600,
-                                )
-                                    : AppText(
-                                  "Mobile Login",
-                                  color: Colors.grey,
-                                  fontSize: 16,
-                                ),
-
-
-
-
-                              ],
-                            ),
-                          ),
-
-                          const SizedBox(width: 40),
-
-                          GestureDetector(
-                            onTap: (){
-                              setState(() {
-                                isMobileLogin = false;
-                              });
-                            },
-                            child: Column(
-                              children: [
-
-                                !isMobileLogin
-                                    ? const GradientAppText(
-                                  text: "Email Login",
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600,
-                                )
-                                    : AppText(
-                                  "Email Login",
-                                  color: Colors.grey,
-                                  fontSize: 16,
-                                ),
-
-                              ],
-                            ),
-                          ),
-                        ],
+                      // ── LOGIN TABS ──
+                      Center(
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            _tabBtn("Mobile Login", isMobileLogin, () => setState(() => isMobileLogin = true)),
+                            const SizedBox(width: 36),
+                            _tabBtn("Email Login", !isMobileLogin, () => setState(() => isMobileLogin = false)),
+                          ],
+                        ),
                       ),
 
-                      const SizedBox(height: 25),
+                      const SizedBox(height: 24),
 
-                      /// PHONE FIELD
-                      Container(
-                        height: 55,
-                        padding: const EdgeInsets.symmetric(horizontal: 15),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(
-                            color: const Color(0xFFE5E5E5),
-                            width: 1,
-                          ),
-                        ),
+                      // ── PHONE FIELD ──
+                      _fieldLabel("Phone Number"),
+                      const SizedBox(height: 6),
+                      _inputBox(
                         child: Row(
                           children: [
-
-                             AppText("🇮🇳"),
-
+                            AppText("🇮🇳", fontSize: 18),
+                            const SizedBox(width: 6),
+                            AppText("+91", fontSize: 15, color: _hintColor),
+                            const Icon(Icons.arrow_drop_down, color: _hintColor, size: 20),
                             const SizedBox(width: 8),
-
-                             AppText(
-                              "+91",
-                              fontSize: 16,
-                                 color: Color(0XFFc1c1c1)
-                            ),
-
-                            const Icon(Icons.arrow_drop_down, color: Color(0XFFc1c1c1),),
-
-                            const SizedBox(width: 10),
-
                             const Expanded(
                               child: TextField(
+                                keyboardType: TextInputType.phone,
                                 decoration: InputDecoration(
                                   border: InputBorder.none,
-                                  hintText: "Enter Phone Number",
-                                  hintStyle: TextStyle(  fontSize: 16,
-                                      color: Color(0XFFc1c1c1),fontWeight:
-                                      FontWeight.w500
-                                  )
+                                  hintText: "Enter phone number",
+                                  hintStyle: TextStyle(
+                                      fontSize: 15,
+                                      color: _hintColor,
+                                      fontWeight: FontWeight.w400),
                                 ),
                               ),
                             ),
@@ -180,135 +114,183 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
 
-                      const SizedBox(height: 15),
+                      const SizedBox(height: 14),
 
-                      /// OTP FIELD
-                      Container(
-                        height: 55,
-                        padding: const EdgeInsets.symmetric(horizontal: 15),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(
-                            color: const Color(0xFFE5E5E5),
-                            width: 1,
-                          ),
-                        ),
+                      // ── OTP FIELD ──
+                      _fieldLabel("OTP"),
+                      const SizedBox(height: 6),
+                      _inputBox(
                         child: Row(
                           children: [
-
                             const Expanded(
                               child: TextField(
+                                keyboardType: TextInputType.number,
                                 decoration: InputDecoration(
                                   border: InputBorder.none,
-                                  hintText: "Enter Otp",
-                                    hintStyle: TextStyle(color: Color(0XFFc1c1c1),fontSize: 16,)
-
+                                  hintText: "Enter OTP",
+                                  hintStyle: TextStyle(
+                                      color: _hintColor, fontSize: 15),
                                 ),
                               ),
                             ),
-
-                            Container(
-                              height: 38,
-                              padding: const EdgeInsets.symmetric(horizontal: 20),
-                              decoration: BoxDecoration(
-                                color: const Color(0xffd1963a).withOpacity(0.4),
-                                borderRadius: BorderRadius.circular(10),
+                            GestureDetector(
+                              onTap: () {},
+                              child: Container(
+                                height: 36,
+                                padding: const EdgeInsets.symmetric(horizontal: 16),
+                                decoration: BoxDecoration(
+                                  gradient: const LinearGradient(
+                                    colors: [_gold1, _gold2],
+                                    begin: Alignment.centerLeft,
+                                    end: Alignment.centerRight,
+                                  ),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                alignment: Alignment.center,
+                                child: const Text(
+                                  "GET OTP",
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 13),
+                                ),
                               ),
-                              alignment: Alignment.center,
-                              child:  AppText(
-                                "GET OTP",
-                                color: Colors.white,
-                                fontWeight: FontWeight.w500,
-                                fontSize: 14,
-                              ),
-                            )
-
+                            ),
                           ],
                         ),
                       ),
 
-                      const SizedBox(height: 15),
+                      const SizedBox(height: 14),
 
-                      /// INVITATION CODE
-                      Container(
-                        height: 55,
-                        padding: const EdgeInsets.symmetric(horizontal: 15),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(
-                            color: const Color(0xFFE5E5E5),
-                            width: 1,
-                          ),
-                        ),
+                      // ── INVITATION CODE ──
+                      _fieldLabel("Invitation Code (optional)"),
+                      const SizedBox(height: 6),
+                      _inputBox(
                         child: const TextField(
                           decoration: InputDecoration(
                             border: InputBorder.none,
-                            hintText: "Invitation Code",
-                              hintStyle: TextStyle(color: Color(0XFFc1c1c1),fontSize: 16,)
-
+                            hintText: "Enter invitation code",
+                            hintStyle: TextStyle(color: _hintColor, fontSize: 15),
                           ),
                         ),
                       ),
 
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 18),
 
-                      /// HELP TEXT
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children:  [
-
-                          AppText(
-                            "Need help? Contact us at ",
-                            color: Colors.black54,
-                            fontSize: 14,
-                          ),
-
-                          AppText(
-                            "Telegram",
-                            color: Color(0xffd1963a),
-                            fontWeight: FontWeight.w500,
-                            fontSize: 14,
-                          ),
-                        ],
+                      // ── HELP TEXT ──
+                      Center(
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            AppText("Need help? Contact us at ",
+                                color: Colors.black54, fontSize: 13),
+                            AppText("Telegram",
+                                color: _gold2,
+                                fontWeight: FontWeight.w600,
+                                fontSize: 13),
+                          ],
+                        ),
                       ),
 
-                      const SizedBox(height: 25),
+                      const SizedBox(height: 22),
 
-                      /// SIGN IN BUTTON
+                      // ── SIGN IN BUTTON ──
                       GestureDetector(
-                        onTap: (){
+                        onTap: () {
                           predictNavigator.newPage(context, page: MainNavigationPage());
                         },
                         child: Container(
-                          height: 55,
+                          height: 54,
                           width: double.infinity,
                           decoration: BoxDecoration(
-                            color: const Color(0xffd1963a).withOpacity(0.4),
+                            gradient: const LinearGradient(
+                              colors: [_gold1, _gold2],
+                              begin: Alignment.centerLeft,
+                              end: Alignment.centerRight,
+                            ),
                             borderRadius: BorderRadius.circular(14),
+                            boxShadow: [
+                              BoxShadow(
+                                color: _gold2.withValues(alpha: 0.35),
+                                blurRadius: 12,
+                                offset: const Offset(0, 5),
+                              ),
+                            ],
                           ),
                           alignment: Alignment.center,
-                          child:  AppText(
+                          child: const Text(
                             "Sign in",
-                            color: Colors.white,
-                            fontSize: 18,
-                            fontWeight: FontWeight.w500,
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 17,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 0.3,
+                            ),
                           ),
                         ),
                       ),
 
-                      const SizedBox(height: 30),
-
+                      const SizedBox(height: 32),
                     ],
                   ),
                 ),
               ),
             ),
-          )
-
+          ),
         ],
       ),
+    );
+  }
+
+  // ── HELPERS ──────────────────────────────────────────────────────
+
+  Widget _tabBtn(String label, bool active, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Column(
+        children: [
+          active
+              ? GradientAppText(
+            text: label,
+            fontSize: 15,
+            fontWeight: FontWeight.w700,
+          )
+              : AppText(label, color: Colors.grey.shade500, fontSize: 15),
+          const SizedBox(height: 5),
+          if (active)
+            Container(
+              height: 2,
+              width: 80,
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(colors: [_gold1, _gold2]),
+                borderRadius: BorderRadius.circular(1),
+              ),
+            )
+          else
+            const SizedBox(height: 2),
+        ],
+      ),
+    );
+  }
+
+  Widget _fieldLabel(String label) {
+    return Text(
+      label,
+      style: const TextStyle(
+          fontSize: 13, fontWeight: FontWeight.w500, color: Colors.black54),
+    );
+  }
+
+  Widget _inputBox({required Widget child}) {
+    return Container(
+      height: 52,
+      padding: const EdgeInsets.symmetric(horizontal: 14),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: _borderColor),
+      ),
+      child: child,
     );
   }
 }

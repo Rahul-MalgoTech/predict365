@@ -13,46 +13,44 @@ class ReferEarnScreen extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
-
       body: SafeArea(
         child: SingleChildScrollView(
           child: Column(
             children: [
+
+              // ── HEADER ──
               Container(
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   gradient: LinearGradient(
-                    begin: Alignment.topCenter, // starts at top
+                    begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
-
-                    colors: [
-                      Color(0XFFc59224),
-                      Color(0XFF9b741d),
-
-                      Color(0XFF826219),
-                    ],
+                    colors: [Color(0xFFc59224), Color(0xFF9b741d), Color(0xFF826219)],
                   ),
                 ),
-
-                padding: EdgeInsets.all(16),
-
+                padding: const EdgeInsets.all(16),
                 child: Column(
                   children: [
                     Row(
                       children: [
                         ThemeToggleIcon(),
-                        Spacer(),
-                        AppText(
+                        const Spacer(),
+                        const Text(
                           "Refer & Earn",
-                         color: Colors.white,
-                          fontWeight: FontWeight.w600,
-                          fontSize: 18,
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 17,
+                              fontWeight: FontWeight.w700),
                         ),
-                        Spacer(),
+                        const Spacer(),
                         Row(
                           children: [
-                            Image.asset("assets/images/note.png"),
-                            SizedBox(width: 5),
-                            AppText("rules", fontWeight: FontWeight.w600,color: Colors.white,),
+                            Image.asset("assets/images/note.png", height: 18),
+                            const SizedBox(width: 5),
+                            const Text("Rules",
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w500)),
                           ],
                         ),
                       ],
@@ -60,30 +58,30 @@ class ReferEarnScreen extends StatelessWidget {
 
                     const SizedBox(height: 20),
 
-                    /// HERO
                     Row(
                       children: [
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              AppText(
-                                "Invite a Friend and Earn\nLifetime Rewards!"
-                                ,color: Colors.white,
-                                fontSize: 18,
-                                fontWeight: FontWeight.w600,
+                              const Text(
+                                "Invite a Friend and Earn\nLifetime Rewards!",
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 17,
+                                    fontWeight: FontWeight.w700),
                               ),
-                              SizedBox(height: 10),
-                              AppText(
-                                "Get a 5% bonus on their first deposit, plus up to 20% commission on every Winning commission.",
-                                  color: Colors.white.withOpacity(0.8),
-                                fontSize: 13,
+                              const SizedBox(height: 10),
+                              Text(
+                                "Get a 5% bonus on their first deposit, plus up to 20% commission on every winning.",
+                                style: TextStyle(
+                                    color: Colors.white.withValues(alpha: 0.85),
+                                    fontSize: 13),
                               ),
                             ],
                           ),
                         ),
-
-                        Image.asset("assets/images/referfriend.png", height: 110),
+                        Image.asset("assets/images/referfriend.png", height: 100),
                       ],
                     ),
                   ],
@@ -92,17 +90,16 @@ class ReferEarnScreen extends StatelessWidget {
 
               const SizedBox(height: 16),
 
-              /// BONUS CARD
+              // ── BONUS CARD ──
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(14),
+                    borderRadius: BorderRadius.circular(12),
                     color: theme.primaryColorDark,
                     border: Border.all(color: theme.dividerColor),
                   ),
-
                   child: Column(
                     children: [
                       Row(
@@ -112,9 +109,7 @@ class ReferEarnScreen extends StatelessWidget {
                           _BonusItem("Total Referrals", "0"),
                         ],
                       ),
-
-                      Divider(height: 30, color: theme.dividerColor),
-
+                      Divider(height: 28, color: theme.dividerColor),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: const [
@@ -122,14 +117,12 @@ class ReferEarnScreen extends StatelessWidget {
                           _BonusItem("Per-Deposit Bonus", "₹0.00"),
                         ],
                       ),
-
-                      Divider(height: 30, color: theme.dividerColor),
-
+                      Divider(height: 28, color: theme.dividerColor),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: const [
                           _BonusItem("Recharge Bonus", "₹0.00"),
-                          _BonusItem("Win Commission Bonus", "₹0.00"),
+                          _BonusItem("Win Commission", "₹0.00"),
                         ],
                       ),
                     ],
@@ -139,7 +132,7 @@ class ReferEarnScreen extends StatelessWidget {
 
               const SizedBox(height: 16),
 
-              /// INVITE CODE
+              // ── INVITE CODE ──
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Container(
@@ -149,59 +142,42 @@ class ReferEarnScreen extends StatelessWidget {
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(color: theme.dividerColor),
                   ),
-
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      AppText(
-                        "My invitation code",
-                        fontWeight: FontWeight.w600,
-                      ),
-
+                      AppText("My invitation code", fontSize: 14, fontWeight: FontWeight.w600),
                       const SizedBox(height: 12),
-
                       Row(
                         children: [
                           Expanded(
                             child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 12,
-                                vertical: 12,
-                              ),
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
                               decoration: BoxDecoration(
-                                color: Colors.grey.withOpacity(.2),
+                                color: Colors.grey.withValues(alpha: 0.15),
                                 borderRadius: BorderRadius.circular(8),
                               ),
-                              child: AppText("9FBPOZZI"),
+                              child: AppText("9FBPOZZI", fontSize: 14),
                             ),
                           ),
-
                           const SizedBox(width: 10),
-
                           Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 12,
-                            ),
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                             decoration: BoxDecoration(
-                              color: Colors.grey.withOpacity(.2),
+                              color: Colors.grey.withValues(alpha: 0.15),
                               borderRadius: BorderRadius.circular(8),
                             ),
-                            child: AppText("Copy"),
+                            child: AppText("Copy", fontSize: 14),
                           ),
                         ],
                       ),
-
                       const SizedBox(height: 14),
-
                       ReuseElevatedButton(
                         width: double.infinity,
-                        gradientColors: [
+                        gradientColors: const [
                           Color(0xFF985720),
                           Color(0xFFB6792E),
                           Color(0xFFD3983B),
                         ],
-
                         text: 'Share link',
                       ),
                     ],
@@ -209,38 +185,32 @@ class ReferEarnScreen extends StatelessWidget {
                 ),
               ),
 
-              const SizedBox(height: 16),
+               SizedBox(height: 16),
 
-              /// INFO CARDS
-              const _InfoCard(
+              // ── INFO CARDS ──
+               _InfoCard(
                 title: "First Deposit Bonus",
-                desc:
-                    "Receive an instant 5% bonus as soon as your referral completes their first recharge",
+                desc: "Receive an instant 5% bonus as soon as your referral completes their first recharge.",
               ),
-
-              const _InfoCard(
+               _InfoCard(
                 title: "Recharge Bonus",
-                desc:
-                    "Earn 5% From your invited Friend's recharge (Excluding the First deposit). Recharge more, earn more.",
+                desc: "Earn 5% from your invited friend's recharge (excluding the first deposit). Recharge more, earn more.",
               ),
 
-              const SizedBox(height: 16),
-              _CommissionBonusCard(),
-              const SizedBox(height: 16),
-              _MilestoneRewardsCard(),
-              const SizedBox(height: 16),
-
-              const SizedBox(height: 30),
+               SizedBox(height: 16),
+               _CommissionBonusCard(),
+               SizedBox(height: 16),
+               _MilestoneRewardsCard(),
+               SizedBox(height: 24),
             ],
           ),
         ),
       ),
-
     );
   }
 }
 
-/// BONUS ITEM
+// ── BONUS ITEM ───────────────────────────────────────────────────
 class _BonusItem extends StatelessWidget {
   final String title;
   final String value;
@@ -252,15 +222,15 @@ class _BonusItem extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        AppText(title, fontSize: 12),
-        const SizedBox(height: 6),
-        AppText(value, fontWeight: FontWeight.w600),
+        AppText(title, fontSize: 12, color: Colors.grey),
+        const SizedBox(height: 5),
+        AppText(value, fontSize: 14, fontWeight: FontWeight.w600),
       ],
     );
   }
 }
 
-/// INFO CARD
+// ── INFO CARD ────────────────────────────────────────────────────
 class _InfoCard extends StatelessWidget {
   final String title;
   final String desc;
@@ -270,7 +240,6 @@ class _InfoCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
       child: Container(
@@ -283,7 +252,7 @@ class _InfoCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            AppText(title, fontWeight: FontWeight.w600),
+            AppText(title, fontSize: 14, fontWeight: FontWeight.w600),
             const SizedBox(height: 6),
             AppText(desc, fontSize: 13, color: Colors.grey),
           ],
@@ -293,13 +262,13 @@ class _InfoCard extends StatelessWidget {
   }
 }
 
+// ── COMMISSION BONUS CARD ────────────────────────────────────────
 class _CommissionBonusCard extends StatelessWidget {
   const _CommissionBonusCard();
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
       child: Container(
@@ -314,28 +283,22 @@ class _CommissionBonusCard extends StatelessWidget {
           children: [
             Row(
               children: [
-                AppText("Commission Bonus", fontWeight: FontWeight.w600),
-                Spacer(),
-                Icon(Icons.help_outline, size: 18),
+                AppText("Commission Bonus", fontSize: 14, fontWeight: FontWeight.w600),
+                const Spacer(),
+                const Icon(Icons.help_outline, size: 16, color: Colors.grey),
               ],
             ),
-
-            const SizedBox(height: 16),
-
+            const SizedBox(height: 14),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                AppText("Affiliate Level", fontWeight: FontWeight.w600),
-                AppText("A Level"),
-                AppText("B Level"),
-                AppText("C Level"),
+                AppText("Level", fontSize: 12, fontWeight: FontWeight.w600, color: Colors.grey),
+                AppText("A Level", fontSize: 12, fontWeight: FontWeight.w600, color: Colors.grey),
+                AppText("B Level", fontSize: 12, fontWeight: FontWeight.w600, color: Colors.grey),
+                AppText("C Level", fontSize: 12, fontWeight: FontWeight.w600, color: Colors.grey),
               ],
             ),
-
-            const SizedBox(height: 12),
-
-            const Divider(),
-
+            Divider(height: 20, color: theme.dividerColor),
             _CommissionRow("Silver", "6.00%", "4.00%", "1.00%"),
             _CommissionRow("Gold", "8.00%", "4.50%", "2.00%"),
             _CommissionRow("Platinum", "12.00%", "5.00%", "3.00%"),
@@ -357,22 +320,27 @@ class _CommissionRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
+      padding: const EdgeInsets.symmetric(vertical: 7),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [AppText(level), AppText(a), AppText(b), AppText(c)],
+        children: [
+          AppText(level, fontSize: 13),
+          AppText(a, fontSize: 13),
+          AppText(b, fontSize: 13),
+          AppText(c, fontSize: 13),
+        ],
       ),
     );
   }
 }
 
+// ── MILESTONE REWARDS CARD ───────────────────────────────────────
 class _MilestoneRewardsCard extends StatelessWidget {
   const _MilestoneRewardsCard();
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
       child: Container(
@@ -382,44 +350,37 @@ class _MilestoneRewardsCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(12),
           border: Border.all(color: theme.dividerColor),
         ),
-
         child: Column(
           children: [
             Row(
               children: [
-                AppText(
-                  "Milestone Invite Rewards",
-                  fontWeight: FontWeight.w600,
-                ),
-                Spacer(),
-                Icon(Icons.help_outline, size: 18),
+                AppText("Milestone Invite Rewards", fontSize: 14, fontWeight: FontWeight.w600),
+                const Spacer(),
+                const Icon(Icons.help_outline, size: 16, color: Colors.grey),
               ],
             ),
-
-            const SizedBox(height: 16),
-
-            AppText(
+            const SizedBox(height: 14),
+            const Text(
               "₹100.00",
-              fontSize: 28,
-              fontWeight: FontWeight.w700,
-              color: Colors.green,
+              style: TextStyle(
+                  fontSize: 26,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.green),
             ),
-
-            const SizedBox(height: 20),
-
+            const SizedBox(height: 18),
             GridView.builder(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               itemCount: 10,
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 4,
-                mainAxisSpacing: 14,
-                crossAxisSpacing: 14,
+                mainAxisSpacing: 12,
+                crossAxisSpacing: 12,
               ),
               itemBuilder: (_, i) {
                 return Column(
                   children: [
-                    Image.asset("assets/images/coin.png", height: 30),
+                    Image.asset("assets/images/coin.png", height: 28),
                     const SizedBox(height: 4),
                     AppText("₹100.00", fontSize: 10),
                     AppText("0/3", fontSize: 10, color: Colors.grey),
@@ -427,19 +388,15 @@ class _MilestoneRewardsCard extends StatelessWidget {
                 );
               },
             ),
-            const SizedBox(height: 10),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: ReuseElevatedButton(
-                width: double.infinity,
-                gradientColors: [
-                  Color(0xFF985720),
-                  Color(0xFFB6792E),
-                  Color(0xFFD3983B),
-                ],
-
-                text: 'Start Earning',
-              ),
+            const SizedBox(height: 14),
+            ReuseElevatedButton(
+              width: double.infinity,
+              gradientColors: const [
+                Color(0xFF985720),
+                Color(0xFFB6792E),
+                Color(0xFFD3983B),
+              ],
+              text: 'Start Earning',
             ),
           ],
         ),

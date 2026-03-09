@@ -4,8 +4,28 @@ import 'package:predict365/Reusable_Widgets/AppText_Theme/AppText_Theme.dart';
 import 'package:predict365/Reusable_Widgets/ReuseableGradientContainer/ReusableGradientContainer.dart';
 import 'package:provider/provider.dart';
 
-class RankingScreen extends StatelessWidget {
+class RankingScreen extends StatefulWidget {
   const RankingScreen({super.key});
+
+  @override
+  State<RankingScreen> createState() => _RankingScreenState();
+}
+
+class _RankingScreenState extends State<RankingScreen> {
+  int selectedCategory = 0;
+  int selectedTab = 0;
+  String selectedFilter = '24h';
+  bool profitAscending = false;
+
+  final List<Map<String, String>> leaders = [
+    {'rank': '1', 'user': 'User185494', 'profit': '59117.54', 'avatar': 'assets/images/rankingprofile.png'},
+    {'rank': '2', 'user': 'User695498', 'profit': '53982.10', 'avatar': 'assets/images/rank2.png'},
+    {'rank': '3', 'user': 'User933818', 'profit': '46053.93', 'avatar': 'assets/images/rankingprofile.png'},
+    {'rank': '4', 'user': 'User933818', 'profit': '46053.93', 'avatar': 'assets/images/rank2.png'},
+  ];
+
+  final List<String> categories = ['Trending', 'Cricket', 'Crypto', 'Politics', 'Sports', 'Entertainment'];
+  final List<String> filters = ['24h', '7d', '30d', 'All'];
 
   @override
   Widget build(BuildContext context) {
@@ -13,12 +33,13 @@ class RankingScreen extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-
       body: SafeArea(
         child: Column(
           children: [
+
+            // ── TOP BAR ──
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
               child: Row(
                 children: [
                   Image.asset(
@@ -28,43 +49,32 @@ class RankingScreen extends StatelessWidget {
                     height: 20,
                   ),
                   const Spacer(),
-
                   Container(
                     decoration: BoxDecoration(
                       color: Theme.of(context).primaryColorDark,
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(color: Theme.of(context).dividerColor),
                     ),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 6,
-                        vertical: 4,
-                      ),
-                      child: Row(
-                        children: [
-                          AppText("₹0.00", fontWeight: FontWeight.w600),
-                          const SizedBox(width: 10),
-                          GradientContainer(
-                            child: const Padding(
-                              padding: EdgeInsets.all(5),
-                              child: Icon(
-                                Icons.add,
-                                size: 18,
-                                color: Colors.white,
-                              ),
-                            ),
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+                    child: Row(
+                      children: [
+                        AppText("₹0.00", fontSize: 13, fontWeight: FontWeight.w600),
+                        const SizedBox(width: 8),
+                        GradientContainer(
+                          child: const Padding(
+                            padding: EdgeInsets.all(4),
+                            child: Icon(Icons.add, size: 16, color: Colors.white),
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   ),
-
                   const SizedBox(width: 10),
                   ThemeToggleIcon(),
                   const SizedBox(width: 10),
-                  const Icon(Icons.notifications_none),
+                  Icon(Icons.notifications_none,
+                      color: Theme.of(context).iconTheme.color, size: 22),
                   const SizedBox(width: 10),
-
                   const CircleAvatar(
                     radius: 16,
                     backgroundImage: AssetImage("assets/images/myprofile.png"),
@@ -73,216 +83,189 @@ class RankingScreen extends StatelessWidget {
               ),
             ),
 
-            const SizedBox(height: 25),
-
+            // ── CATEGORY TABS ──
             SizedBox(
-              height: 30,
-              child: ListView(
+              height: 32,
+              child: ListView.builder(
                 scrollDirection: Axis.horizontal,
                 padding: const EdgeInsets.symmetric(horizontal: 16),
-                children: const [
-                  CategoryItem("Trending", true),
-                  CategoryItem("Cricket", false),
-                  CategoryItem("Crypto", false),
-                  CategoryItem("Politics", false),
-                  CategoryItem("Sports", false),
-                  CategoryItem("Entertainment", false),
-                ],
+                itemCount: categories.length,
+                itemBuilder: (context, i) {
+                  final isSelected = selectedCategory == i;
+                  return GestureDetector(
+                    onTap: () => setState(() => selectedCategory = i),
+                    child: Padding(
+                      padding: const EdgeInsets.only(right: 20),
+                      child: AppText(
+                        categories[i],
+                        fontSize: 14,
+                        color: isSelected
+                            ? Theme.of(context).textTheme.labelLarge!.color
+                            : Colors.grey,
+                        fontWeight: isSelected ? FontWeight.w700 : FontWeight.w400,
+                      ),
+                    ),
+                  );
+                },
               ),
             ),
 
-            const SizedBox(height: 7),
-
-            Divider(color: Theme.of(context).dividerColor, thickness: 2),
+            const SizedBox(height: 6),
+            Divider(color: Theme.of(context).dividerColor, thickness: 1),
             const SizedBox(height: 10),
 
+            // ── LEADERBOARD / FRIENDS TABS ──
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Row(
                 children: [
-                  Column(
-                    children: [
-                      AppText(
-                        "Leaderboard",
-                        fontWeight: FontWeight.w600,
-                        fontSize: 16,
-                      ),
-
-                      const SizedBox(height: 6),
-
-                      Container(
-                        height: 2,
-                        width: 100,
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).dividerColor,
-                          borderRadius: BorderRadius.circular(2),
-                        ),
-                      ),
-                    ],
-                  ),
-
-                  SizedBox(width: 20),
-                  Column(
-                    children: [
-                      AppText("Friends (0)", color: Colors.grey),
-                      const SizedBox(height: 8),
-                    ],
-                  ),
+                  _tabItem("Leaderboard", 0),
+                  const SizedBox(width: 24),
+                  _tabItem("Friends (0)", 1),
                 ],
               ),
             ),
 
             const SizedBox(height: 12),
 
+            // ── MY RANK CARD ──
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
                   color: Theme.of(context).primaryColorDark,
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(10),
                   border: Border.all(color: Theme.of(context).dividerColor),
                 ),
                 child: Row(
                   children: [
                     const CircleAvatar(
                       radius: 20,
-                      backgroundImage: AssetImage(
-                        "assets/images/myprofile.png",
-                      ),
+                      backgroundImage: AssetImage("assets/images/myprofile.png"),
                     ),
-
                     const SizedBox(width: 12),
-
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        AppText("Short of the list"),
-                        AppText("₹11,878.88", color: Colors.grey),
+                        AppText("Short of the list", fontSize: 13),
+                        const SizedBox(height: 3),
+                        AppText("₹11,878.88", fontSize: 12, color: Colors.grey),
                       ],
                     ),
-
                     const Spacer(),
-
-                    AppText("₹0.00", fontWeight: FontWeight.bold),
+                    AppText("₹0.00", fontSize: 14, fontWeight: FontWeight.bold),
                   ],
                 ),
               ),
             ),
 
-            const SizedBox(height: 12),
+            const SizedBox(height: 10),
 
+            // ── TICKER ──
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Container(
-                padding: const EdgeInsets.symmetric(
-                  vertical: 8,
-                  horizontal: 12,
-                ),
+                padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
                 decoration: BoxDecoration(
-                  color: Colors.grey.withOpacity(.2),
+                  color: Colors.grey.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Row(
                   children: [
-                    Row(
-                      children: [
-                        Icon(Icons.person, size: 16, color: Colors.grey),
-                        SizedBox(width: 4),
-                        AppText(
-                          "SPYDER placed ",
-                          color: Colors.grey,
-                          fontSize: 13,
-                        ),
-                      ],
-                    ),
-                    SizedBox(width: 6),
-                    AppText(
-                      "Btcusd Up or Down-15 Minute",
-                      fontWeight: FontWeight.w600,
-
-                      fontSize: 13,
+                    const Icon(Icons.person, size: 14, color: Colors.grey),
+                    const SizedBox(width: 4),
+                    AppText("SPYDER placed ", fontSize: 13, color: Colors.grey),
+                    const SizedBox(width: 4),
+                    Expanded(
+                      child: AppText("Btcusd Up or Down-15 Minute",
+                          fontSize: 13, fontWeight: FontWeight.w600),
                     ),
                   ],
                 ),
+              ),
+            ),
+
+            const SizedBox(height: 14),
+
+            // ── PROFIT FILTER ──
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Row(
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      setState(() => profitAscending = !profitAscending);
+                    },
+                    child: Row(
+                      children: [
+                        AppText("Profit", fontSize: 14, fontWeight: FontWeight.w600),
+                        Icon(
+                          profitAscending ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
+                          size: 18,
+                        ),
+                      ],
+                    ),
+                  ),
+                  const Spacer(),
+                  Container(
+                    padding: const EdgeInsets.all(3),
+                    decoration: BoxDecoration(
+                      color: Colors.grey.withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Row(
+                      children: filters.map((f) {
+                        final isSelected = selectedFilter == f;
+                        return GestureDetector(
+                          onTap: () => setState(() => selectedFilter = f),
+                          child: isSelected
+                              ? GradientContainer(
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                            margin: const EdgeInsets.symmetric(horizontal: 2),
+                            child: AppText(f, fontSize: 12, color: Colors.white),
+                          )
+                              : Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                            margin: const EdgeInsets.symmetric(horizontal: 2),
+                            child: AppText(f, fontSize: 12, color: Colors.grey),
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                ],
               ),
             ),
 
             const SizedBox(height: 16),
 
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Row(
-                children: [
-                  AppText("Profit", fontWeight: FontWeight.w600),
-
-                  const Icon(Icons.keyboard_arrow_down),
-
-                  const Spacer(),
-
-                  Container(
-                    padding: const EdgeInsets.all(4),
-                    decoration: BoxDecoration(
-                      color: Colors.grey.withOpacity(.2),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Row(
-                      children: const [
-                        FilterItem("24h", true),
-                        FilterItem("7d", false),
-                        FilterItem("30d", false),
-                        FilterItem("All", false),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 20),
-
+            // ── LEADER LIST ──
             Expanded(
-              child: ListView(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                children: const [
-                  LeaderItem(
-                    rank: "1",
-                    user: "User185494",
-                    profit: "+₹59,117.54",
-                    avatar: "assets/images/rankingprofile.png",
-                    badgeNumber: "1",
-                  ),
-
-                  SizedBox(height: 18),
-
-                  LeaderItem(
-                    rank: "2",
-                    user: "User695498",
-                    profit: "+₹53,982.10",
-                    avatar: "assets/images/rank2.png",
-                    badgeNumber: "2",
-                  ),
-
-                  SizedBox(height: 18),
-
-                  LeaderItem(
-                    rank: "3",
-                    user: "User933818",
-                    profit: "+₹46,053.93",
-                    avatar: "assets/images/rankingprofile.png",
-                    badgeNumber: "2",
-                  ),
-
-                  SizedBox(height: 18),
-
-                  LeaderItem(
-                    rank: "4",
-                    user: "User933818",
-                    profit: "+₹46,053.93",
-                    avatar: "assets/images/rank2.png",
-                    badgeNumber: "4",
-                  ),
-                ],
+              child: Builder(
+                builder: (context) {
+                  final sorted = [...leaders];
+                  sorted.sort((a, b) {
+                    final pa = double.parse(a['profit']!);
+                    final pb = double.parse(b['profit']!);
+                    return profitAscending ? pa.compareTo(pb) : pb.compareTo(pa);
+                  });
+                  return ListView.builder(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    itemCount: sorted.length,
+                    itemBuilder: (context, i) {
+                      final item = sorted[i];
+                      final displayRank = (i + 1).toString();
+                      return LeaderItem(
+                        rank: displayRank,
+                        user: item['user']!,
+                        profit: "+₹${item['profit']}",
+                        avatar: item['avatar']!,
+                        badgeNumber: displayRank,
+                      );
+                    },
+                  );
+                },
               ),
             ),
           ],
@@ -290,56 +273,37 @@ class RankingScreen extends StatelessWidget {
       ),
     );
   }
-}
-
-class CategoryItem extends StatelessWidget {
-  final String title;
-  final bool selected;
-
-  const CategoryItem(this.title, this.selected, {super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.only(right: 16),
-      child: AppText(
-        title,
-
-        color: selected
-            ? Theme.of(context).textTheme.labelLarge!.color
-            : Colors.grey,
-        fontWeight: selected ? FontWeight.bold : FontWeight.normal,
+  Widget _tabItem(String label, int index) {
+    final isSelected = selectedTab == index;
+    return GestureDetector(
+      onTap: () => setState(() => selectedTab = index),
+      child: Column(
+        children: [
+          AppText(
+            label,
+            fontSize: 15,
+            fontWeight: isSelected ? FontWeight.w700 : FontWeight.w400,
+            color: isSelected ? null : Colors.grey,
+          ),
+          const SizedBox(height: 5),
+          if (isSelected)
+            Container(
+              height: 2,
+              width: 80,
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [Color(0xFF977032), Color(0xFFF5A623)],
+                ),
+                borderRadius: BorderRadius.circular(2),
+              ),
+            )
+          else
+            const SizedBox(height: 2),
+        ],
       ),
     );
   }
 }
-
-class FilterItem extends StatelessWidget {
-  final String text;
-  final bool selected;
-
-  const FilterItem(this.text, this.selected, {super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return selected
-        ? GradientContainer(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-            margin: const EdgeInsets.symmetric(horizontal: 2),
-            child: AppText(text, fontSize: 12,color: Colors.white,),
-          )
-        : Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-            margin: const EdgeInsets.symmetric(horizontal: 2),
-            decoration: BoxDecoration(
-              color: selected ? Colors.white : Colors.transparent,
-              borderRadius: BorderRadius.circular(6),
-            ),
-            child: AppText(text, fontSize: 12),
-          );
-  }
-}
-
 class LeaderItem extends StatelessWidget {
   final String rank;
   final String user;
@@ -359,73 +323,57 @@ class LeaderItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Widget rankWidget;
-
     if (rank == "1") {
-      rankWidget = Image.asset("assets/images/goldmedal.png", height: 32);
+      rankWidget = Image.asset("assets/images/goldmedal.png", height: 30);
     } else if (rank == "2") {
-      rankWidget = Image.asset("assets/images/silver.png", height: 32);
+      rankWidget = Image.asset("assets/images/silver.png", height: 30);
     } else if (rank == "3") {
-      rankWidget = Image.asset("assets/images/bronze.png", height: 32);
+      rankWidget = Image.asset("assets/images/bronze.png", height: 30);
     } else {
-      rankWidget = AppText(rank, fontSize: 16, fontWeight: FontWeight.w600);
+      rankWidget = AppText(rank, fontSize: 15, fontWeight: FontWeight.w600);
     }
 
     return Padding(
-      padding: const EdgeInsets.only(bottom: 18),
+      padding: const EdgeInsets.only(bottom: 16),
       child: Row(
         children: [
-          SizedBox(width: 36, child: Center(child: rankWidget)),
-
-          const SizedBox(width: 15),
-
+          SizedBox(width: 34, child: Center(child: rankWidget)),
+          const SizedBox(width: 14),
           Stack(
             clipBehavior: Clip.none,
             children: [
               CircleAvatar(radius: 20, backgroundImage: AssetImage(avatar)),
-
               Positioned(
-                bottom: -2,
-                right: -2,
+                bottom: -2, right: -2,
                 child: Container(
-                  height: 18,
-                  width: 18,
+                  height: 17, width: 17,
                   decoration: const BoxDecoration(
-                    color: Color(0xff0bc187),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(Icons.add, size: 16, color: Colors.white),
+                      color: Color(0xff0bc187), shape: BoxShape.circle),
+                  child: const Icon(Icons.add, size: 13, color: Colors.white),
                 ),
               ),
             ],
           ),
-
-          const SizedBox(width: 14),
-
+          const SizedBox(width: 12),
           Expanded(
-            child: AppText(user, fontSize: 16, fontWeight: FontWeight.w500),
+            child: AppText(user, fontSize: 14, fontWeight: FontWeight.w500),
           ),
-
           Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              AppText(
-                profit,
-                color: const Color(0XFF2fc070),
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
-              ),
-
-              const SizedBox(height: 6),
-
+              AppText(profit,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w700,
+                  color: const Color(0xFF2fc070)),
+              const SizedBox(height: 5),
               Container(
-                height: 26,
-                width: 26,
+                height: 24, width: 24,
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
-                  color: Colors.grey.withOpacity(.2),
+                  color: Colors.grey.withValues(alpha: 0.2),
                   shape: BoxShape.circle,
                 ),
-                child: AppText(badgeNumber, fontSize: 12),
+                child: AppText(badgeNumber, fontSize: 11),
               ),
             ],
           ),

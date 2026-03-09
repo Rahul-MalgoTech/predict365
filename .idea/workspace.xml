@@ -5,18 +5,51 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ef881180-111e-4c11-9554-3295fb13d7a5" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/assets/images/coin.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/images/note.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/images/referfriend.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/PredictScreens/ProfileScreens/profileView.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/PredictScreens/ReferralScreens/RefferalView.dart" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/assets/images/graf.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/assets/images/grafs.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/assets/images/marketbg.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/assets/images/marketbgo.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/lib/acc.dart" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/lib/chat.dart" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/lib/graf.dart" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/lib/market.dart" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/lib/money.dart" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/lib/wach.dart" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/lib/wachlist.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.dart_tool/dartpad/web_plugin_registrant.dart" beforeDir="false" afterPath="$PROJECT_DIR$/.dart_tool/dartpad/web_plugin_registrant.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.dart_tool/package_config.json" beforeDir="false" afterPath="$PROJECT_DIR$/.dart_tool/package_config.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.dart_tool/package_graph.json" beforeDir="false" afterPath="$PROJECT_DIR$/.dart_tool/package_graph.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.dart_tool/version" beforeDir="false" afterPath="$PROJECT_DIR$/.dart_tool/version" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.flutter-plugins-dependencies" beforeDir="false" afterPath="$PROJECT_DIR$/.flutter-plugins-dependencies" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/caches/deviceStreaming.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/caches/deviceStreaming.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Dart_Packages.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Dart_SDK.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/libraries/Dart_SDK.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Flutter_Plugins.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/libraries/Flutter_Plugins.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/PredictScreens/BottomNavScreen/BottomNavScreen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/PredictScreens/BottomNavScreen/BottomNavScreen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/android/app/src/main/java/io/flutter/plugins/GeneratedPluginRegistrant.java" beforeDir="false" afterPath="$PROJECT_DIR$/android/app/src/main/java/io/flutter/plugins/GeneratedPluginRegistrant.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/android/local.properties" beforeDir="false" afterPath="$PROJECT_DIR$/android/local.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/android/predict365_android.iml" beforeDir="false" afterPath="$PROJECT_DIR$/android/predict365_android.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ios/Runner/GeneratedPluginRegistrant.h" beforeDir="false" afterPath="$PROJECT_DIR$/ios/Runner/GeneratedPluginRegistrant.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ios/Runner/GeneratedPluginRegistrant.m" beforeDir="false" afterPath="$PROJECT_DIR$/ios/Runner/GeneratedPluginRegistrant.m" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/PredictScreens/HomeScreens/HomeView.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/PredictScreens/HomeScreens/HomeView.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/PredictScreens/LoginScreens/LoginView.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/PredictScreens/LoginScreens/LoginView.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/PredictScreens/ProfileScreens/profileView.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/PredictScreens/ProfileScreens/profileView.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/PredictScreens/ProtfolioScreens/portfolioView.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/PredictScreens/ProtfolioScreens/portfolioView.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/PredictScreens/RankingScreens/RankingView.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/PredictScreens/RankingScreens/RankingView.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/Predict_Utils/ColorHandlers/AppColors.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Predict_Utils/ColorHandlers/AppColors.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/Reusable_Widgets/ReuseElevateButton/ReuseElevateButton.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Reusable_Widgets/ReuseElevateButton/ReuseElevateButton.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/PredictScreens/ReferralScreens/RefferalView.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/PredictScreens/ReferralScreens/RefferalView.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/Predict_Utils/ColorHandlers/Apptheme.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Predict_Utils/ColorHandlers/Apptheme.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/main.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/main.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/linux/flutter/generated_plugin_registrant.cc" beforeDir="false" afterPath="$PROJECT_DIR$/linux/flutter/generated_plugin_registrant.cc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/linux/flutter/generated_plugin_registrant.h" beforeDir="false" afterPath="$PROJECT_DIR$/linux/flutter/generated_plugin_registrant.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/linux/flutter/generated_plugins.cmake" beforeDir="false" afterPath="$PROJECT_DIR$/linux/flutter/generated_plugins.cmake" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/macos/Flutter/GeneratedPluginRegistrant.swift" beforeDir="false" afterPath="$PROJECT_DIR$/macos/Flutter/GeneratedPluginRegistrant.swift" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/predict365.iml" beforeDir="false" afterPath="$PROJECT_DIR$/predict365.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pubspec.lock" beforeDir="false" afterPath="$PROJECT_DIR$/pubspec.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pubspec.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/pubspec.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/windows/flutter/generated_plugin_registrant.cc" beforeDir="false" afterPath="$PROJECT_DIR$/windows/flutter/generated_plugin_registrant.cc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/windows/flutter/generated_plugin_registrant.h" beforeDir="false" afterPath="$PROJECT_DIR$/windows/flutter/generated_plugin_registrant.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/windows/flutter/generated_plugins.cmake" beforeDir="false" afterPath="$PROJECT_DIR$/windows/flutter/generated_plugins.cmake" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -45,7 +78,7 @@
   <component name="GithubPullRequestsUISettings">{
   &quot;selectedUrlAndAccountId&quot;: {
     &quot;url&quot;: &quot;https://github.com/Rahul-MalgoTech/predict365.git&quot;,
-    &quot;accountId&quot;: &quot;6b1584b8-5ca9-4b99-9771-71ec8dea9c0a&quot;
+    &quot;accountId&quot;: &quot;f35e7fe7-6a2c-4058-95e6-cb1a3a9e92f9&quot;
   }
 }</component>
   <component name="ProjectColorInfo">{
@@ -56,30 +89,36 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Flutter.main.dart.executor": "Run",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.cidr.known.project.marker": "true",
-    "RunOnceActivity.readMode.enableVisualFormatting": "true",
-    "cf.first.check.clang-format": "false",
-    "cidr.known.project.marker": "true",
-    "dart.analysis.tool.window.visible": "false",
-    "git-widget-placeholder": "main",
-    "io.flutter.reload.alreadyRun": "true",
-    "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "/Users/oridetechnologies/StudioProjects/predict365/assets/images",
-    "settings.editor.selected.configurable": "dart.settings",
-    "show.migrate.to.gradle.popup": "false"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Flutter.main.dart.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.readMode.enableVisualFormatting&quot;: &quot;true&quot;,
+    &quot;cf.first.check.clang-format&quot;: &quot;false&quot;,
+    &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;dart.analysis.tool.window.visible&quot;: &quot;false&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;io.flutter.project.isFirstOpen&quot;: &quot;true&quot;,
+    &quot;io.flutter.reload.alreadyRun&quot;: &quot;true&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/Malgo Dev/StudioProjects/predict365/assets/images&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;dart.settings&quot;,
+    &quot;show.migrate.to.gradle.popup&quot;: &quot;false&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\Malgo Dev\StudioProjects\predict365\assets\images" />
       <recent name="$PROJECT_DIR$/assets/images" />
       <recent name="$PROJECT_DIR$/assets/fonts" />
       <recent name="$PROJECT_DIR$/lib" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\Malgo Dev\StudioProjects\predict365\assets\images" />
+      <recent name="C:\Users\Malgo Dev\StudioProjects\predict365\lib" />
+      <recent name="C:\Users\Malgo Dev\StudioProjects\predict365\assets\vaibahvimages" />
       <recent name="$PROJECT_DIR$/lib/PredictScreens/LoginScreens" />
     </key>
   </component>
@@ -110,21 +149,12 @@
       <option name="project" value="LOCAL" />
       <updated>1772602418177</updated>
     </task>
-    <task id="LOCAL-00002" summary="home,rank ui">
-      <option name="closed" value="true" />
-      <created>1772693769201</created>
-      <option name="number" value="00002" />
-      <option name="presentableId" value="LOCAL-00002" />
-      <option name="project" value="LOCAL" />
-      <updated>1772693769201</updated>
-    </task>
-    <option name="localTasksCounter" value="3" />
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="initial commit" />
-    <MESSAGE value="home,rank ui" />
-    <option name="LAST_COMMIT_MESSAGE" value="home,rank ui" />
+    <option name="LAST_COMMIT_MESSAGE" value="initial commit" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -133,6 +163,16 @@
           <url>file://$PROJECT_DIR$/lib/PredictScreens/BottomNavScreen/BottomNavScreen.dart</url>
           <line>9</line>
           <option name="timeStamp" value="2" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="Dart">
+          <url>file://$PROJECT_DIR$/lib/graf.dart</url>
+          <line>1391</line>
+          <option name="timeStamp" value="3" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="Dart">
+          <url>file://$PROJECT_DIR$/lib/wachlist.dart</url>
+          <line>11</line>
+          <option name="timeStamp" value="4" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
