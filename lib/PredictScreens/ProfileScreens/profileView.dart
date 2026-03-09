@@ -5,7 +5,7 @@ import 'package:predict365/acc.dart';
 import 'package:predict365/chat.dart';
 import 'package:predict365/money.dart';
 import 'package:predict365/wach.dart';
-import 'package:predict365/wachlist.dart';
+import 'package:predict365/wachlist.dart' hide WatchlistScreen;
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -134,7 +134,7 @@ class ProfileScreen extends StatelessWidget {
 
               GestureDetector(
                 onTap: (){
-                  predictNavigator.newPage(context, page: WatchlistEmptyScreen());
+                  predictNavigator.newPage(context, page: WatchlistScreen());
                 },
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
