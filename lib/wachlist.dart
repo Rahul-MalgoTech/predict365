@@ -7,6 +7,7 @@ class WatchlistScreen extends StatelessWidget {
   const WatchlistScreen({super.key});
 
   static const List<Map<String, dynamic>> _items = [
+
     {'icon': Icons.rule,               'label': 'Market Rules'},
     {'icon': Icons.airline_stops,      'label': 'Market Outcomes'},
     {'icon': Icons.book_outlined,        'label': 'The Orderbook'},
