@@ -47,13 +47,13 @@ class _WatchlistScreenState extends State<WatchlistScreen> {
     final div    = isDark ? Colors.grey.shade800 : Colors.grey.shade200;
 
     return Scaffold(
-      backgroundColor: isDark ? const Color(0xFF121212) : const Color(0xFFF5F5F5),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor.withOpacity(0.99),
       body: SafeArea(
         child: Column(
           children: [
             // ── Top bar ──
             Container(
-              color: bg,
+
               padding: EdgeInsets.symmetric(
                 horizontal: sw * 0.04,
                 vertical: sw * 0.035,
@@ -66,13 +66,13 @@ class _WatchlistScreenState extends State<WatchlistScreen> {
                   ),
                   Expanded(
                     child: Center(
-                      child: Text(
+                      child: AppText(
                         'Watchlist',
-                        style: TextStyle(
-                          fontSize: sw * 0.045,
-                          fontWeight: FontWeight.w500,
-                          color: txt,
-                        ),
+
+                        fontSize: sw * 0.045,
+                        fontWeight: FontWeight.w500,
+                        color: txt,
+
                       ),
                     ),
                   ),
@@ -124,7 +124,6 @@ class _EventCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bg     = isDark ? const Color(0xFF1C1C1E) : Colors.white;
     final txt    = isDark ? Colors.white : Colors.black87;
     final sub    = isDark ? Colors.grey.shade400 : Colors.grey.shade600;
     final div    = isDark ? Colors.grey.shade700 : Colors.grey.shade200;
@@ -133,7 +132,7 @@ class _EventCard extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        color: bg,
+        color: Theme.of(context).primaryColorDark,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: div),
       ),
@@ -164,24 +163,25 @@ class _EventCard extends StatelessWidget {
               ),
               SizedBox(width: sw * 0.03),
               Expanded(
-                child: Text(
+                child: AppText(
+                  maxLines: 2,
                   event['title'] as String,
-                  style: TextStyle(
-                    fontSize: sw * 0.037,
-                    fontWeight: FontWeight.w600,
-                    color: txt,
-                    height: 1.35,
-                  ),
+
+                  fontSize: 15,
+                  fontWeight: FontWeight.w500,
+                  color: txt,
+
+
                 ),
               ),
               SizedBox(width: sw * 0.02),
-              Text(
+              AppText(
                 event['percent'] as String,
-                style: TextStyle(
-                  fontSize: sw * 0.037,
-                  fontWeight: FontWeight.w600,
-                  color: txt,
-                ),
+
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: txt,
+
               ),
             ],
           ),

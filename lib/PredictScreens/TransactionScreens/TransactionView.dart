@@ -81,7 +81,7 @@ class _TransactionScreenState extends State<TransactionScreen> {
     ));
 
     return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor.withOpacity(0.99),
       body: SafeArea(
         child: Column(
           children: [
@@ -145,9 +145,9 @@ class _TransactionScreenState extends State<TransactionScreen> {
                               ),
                               if (isActive)
                                 Container(
-                                height: 2,
-                                width: 60,
-                                color: isDark ? Colors.white : Colors.black),
+                                    height: 2,
+                                    width: 60,
+                                    color: isDark ? Colors.white : Colors.black),
                             ],
                           ),
                         );

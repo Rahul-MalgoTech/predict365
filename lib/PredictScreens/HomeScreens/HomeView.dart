@@ -1,15 +1,45 @@
 import 'package:flutter/material.dart';
+import 'package:predict365/Models/EventModel.dart';
+import 'package:predict365/PredictScreens/DepositWithdrawScreen/DepositWithdrawScreen.dart';
+import 'package:predict365/PredictScreens/HomeScreens/SearchView.dart';
+import 'package:predict365/PredictScreens/MatchScreens/matchView.dart';
+import 'package:predict365/PredictScreens/PredictionDetailScreens/predictionDetailView.dart';
 import 'package:predict365/Predict_Utils/App_Theme/App_Theme.dart';
 import 'package:predict365/Reusable_Widgets/AppText_Theme/AppText_Theme.dart';
 import 'package:predict365/Reusable_Widgets/BondingNavigator.dart';
 import 'package:predict365/Reusable_Widgets/ReuseableGradientContainer/ReusableGradientContainer.dart';
-import 'package:predict365/graf.dart';
-import 'package:predict365/market.dart';
-import 'package:predict365/money.dart';
+import 'package:predict365/Reusable_Widgets/ShimmerLoaderWidget/ShimmerWidget.dart';
+import 'package:predict365/ViewModel/CategoryVM.dart';
+import 'package:predict365/ViewModel/EventVM.dart';
+import 'package:predict365/ViewModel/UserVM.dart';
 import 'package:provider/provider.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  bool _isLoading = true;
+  int  selectedCategory = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadData();
+  }
+
+  Future<void> _loadData() async {
+    await Future.wait([
+      context.read<EventViewModel>().fetchEvents(),
+      context.read<CategoryViewModel>().fetchCategories(),
+      context.read<UserViewModel>().fetchMe(),
+      Future.delayed(const Duration(seconds: 1)),
+    ]);
+    if (mounted) setState(() => _isLoading = false);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -23,187 +53,290 @@ class HomeScreen extends StatelessWidget {
 
             // ── TOP BAR ──
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-              child: Row(
-                children: [
-                  Image.asset(
-                    isDark
-                        ? "assets/images/predictlogowhite.png"
-                        : "assets/images/predictlogo.png",
-                    height: 22,
-                  ),
-                  const Spacer(),
-                  GestureDetector(
-                    onTap: (){
-                      predictNavigator.newPage(context, page: DepositScreen());
-                    },
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).primaryColorDark,
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: Theme.of(context).dividerColor),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+              child: Consumer<UserViewModel>(
+                builder: (context, userVm, _) {
+                  final user = userVm.user;
+                  final balance = user?.balanceFormatted ?? '₹0.00';
+                  return Row(
+                    children: [
+                      Image.asset(
+                        isDark
+                            ? "assets/images/predictlogowhite.png"
+                            : "assets/images/predictlogo.png",
+                        height: 22,
                       ),
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
-                      child: Row(
-                        children: [
-                          AppText("₹0.00", fontSize: 13, fontWeight: FontWeight.w600),
-                          const SizedBox(width: 8),
-                          GradientContainer(
-                            child: const Padding(
-                              padding: EdgeInsets.all(4),
-                              child: Icon(Icons.add, size: 16, color: Colors.white),
-                            ),
+                      const Spacer(),
+                      GestureDetector(
+                        onTap: () => predictNavigator.newPage(context, page: DepositScreen()),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).primaryColorDark,
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(color: Theme.of(context).dividerColor),
                           ),
-                        ],
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+                          child: Row(
+                            children: [
+                              AppText(balance, fontSize: 13, fontWeight: FontWeight.w600),
+                              const SizedBox(width: 8),
+                              GradientContainer(
+                                child: const Padding(
+                                  padding: EdgeInsets.all(4),
+                                  child: Icon(Icons.add, size: 16, color: Colors.white),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                       ),
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  ThemeToggleIcon(),
-                  const SizedBox(width: 10),
-                  Icon(Icons.notifications_none,
-                      color: Theme.of(context).iconTheme.color, size: 22),
-                  const SizedBox(width: 10),
-                  const CircleAvatar(
-                    radius: 16,
-                    backgroundImage: AssetImage("assets/images/myprofile.png"),
-                  ),
-                ],
+                      const SizedBox(width: 10),
+                      ThemeToggleIcon(),
+                      const SizedBox(width: 10),
+                      Icon(Icons.notifications_none,
+                          color: Theme.of(context).iconTheme.color, size: 22),
+                      const SizedBox(width: 10),
+                      // Profile avatar — network image if available, else asset fallback
+                      CircleAvatar(
+                        radius: 16,
+                        backgroundImage: (user?.profileImage != null && user!.profileImage!.isNotEmpty)
+                            ? NetworkImage(user.profileImage!) as ImageProvider
+                            : const AssetImage("assets/images/myprofile.png"),
+                      ),
+                    ],
+                  );
+                },
               ),
             ),
 
             // ── CATEGORY TABS ──
             SizedBox(
-              height: 36,
-              child: ListView(
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                children: const [
-                  CategoryItem("Trending", true),
-                  CategoryItem("Cricket", false),
-                  CategoryItem("Crypto", false),
-                  CategoryItem("Politics", false),
-                  CategoryItem("Sports", false),
-                  CategoryItem("Entertainment", false),
-                ],
+              height: 32,
+              child: Consumer<CategoryViewModel>(
+                builder: (context, catVm, _) {
+                  final cats = catVm.categoryNames; // ['Trending', ...API names]
+                  return ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    itemCount: cats.length,
+                    itemBuilder: (context, i) {
+                      final isSelected = selectedCategory == i;
+                      return GestureDetector(
+                        onTap: () {
+                          if (selectedCategory == i) return; // already active
+                          setState(() => selectedCategory = i);
+                          // i == 0 → "Trending" → show all
+                          // i == 1 → "All"      → show all
+                          // i >= 2 → API category → filter by _id
+                          final categoryId = i < 2
+                              ? null
+                              : catVm.categories[i - 2].id;
+                          context.read<EventViewModel>()
+                              .filterByCategory(categoryId);
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.only(right: 20),
+                          child: AppText(
+                            cats[i],
+                            fontSize: 16,
+                            color: isSelected
+                                ? Theme.of(context).textTheme.labelLarge!.color
+                                : Colors.grey.shade600,
+                            fontWeight:
+                            isSelected ? FontWeight.w500 : FontWeight.w400,
+                          ),
+                        ),
+                      );
+                    },
+                  );
+                },
               ),
             ),
 
-            const SizedBox(height: 4),
+            const SizedBox(height: 2),
             Divider(color: Theme.of(context).dividerColor, thickness: 1),
-            const SizedBox(height: 6),
+            const SizedBox(height: 3),
 
+            // ── BODY ──
             Expanded(
-              child: SingleChildScrollView(
-                child: Column(
-                  children: [
+              child: _isLoading
+                  ? HomeScreenSkeleton()
+                  : Consumer<EventViewModel>(
+                builder: (context, vm, _) {
+                  // Only show shimmer on initial load, not on category switch
+                  if (vm.isLoading) return HomeScreenSkeleton();
 
-                    // Quick Cards
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(12, 8, 12, 0),
-                      child: Column(
-                        children: [
-                          Row(
-                            children: const [
-                              Expanded(child: QuickCard("BTC/USDT", "LIVE", logo: 'assets/images/paircoin.png')),
-                              SizedBox(width: 8),
-                              Expanded(child: QuickCard("Youtube", "Hot", logo: 'assets/images/youtubelogo.png')),
-                              SizedBox(width: 8),
-                              Expanded(child: QuickCard("15 M", "", logo: 'assets/images/bitcoin.png')),
+                  final events = vm.events; // already filtered client-side
+
+                  return SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        // ── Quick Cards ──
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(12, 8, 12, 0),
+                          child: Column(
+                            children: [
+                              Row(
+                                children: const [
+                                  Expanded(child: QuickCard("BTC/USDT", "LIVE", logo: 'assets/images/paircoin.png')),
+                                  SizedBox(width: 8),
+                                  Expanded(child: QuickCard("Youtube",  "Hot",  logo: 'assets/images/youtubelogo.png')),
+                                  SizedBox(width: 8),
+                                  Expanded(child: QuickCard("15 M",     "",     logo: 'assets/images/bitcoin.png')),
+                                ],
+                              ),
+                              const SizedBox(height: 14),
+                              Row(
+                                children: const [
+                                  Expanded(child: QuickCard("T20 WC",  "", logo: 'assets/images/circket.png')),
+                                  SizedBox(width: 8),
+                                  Expanded(child: QuickCard("Football","", logo: 'assets/images/game.png')),
+                                  SizedBox(width: 8),
+                                  Expanded(child: QuickCard("Gold",    "", logo: 'assets/images/gold.png')),
+                                ],
+                              ),
                             ],
                           ),
-                          const SizedBox(height: 14),
-                          Row(
-                            children: const [
-                              Expanded(child: QuickCard("T20 WC", "", logo: 'assets/images/circket.png')),
-                              SizedBox(width: 8),
-                              Expanded(child: QuickCard("Football", "", logo: 'assets/images/game.png')),
-                              SizedBox(width: 8),
-                              Expanded(child: QuickCard("Gold", "", logo: 'assets/images/gold.png')),
+                        ),
+
+                        const SizedBox(height: 16),
+
+                        // ── For You header ──
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          child: Row(
+                            children: [
+                              GradientContainer(
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 12, vertical: 7),
+                                  child: AppText("For you",
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.white),
+                                ),
+                              ),
+                              const Spacer(),
+                              GestureDetector(
+                                onTap: () => predictNavigator.newPage(
+                                    context, page: const SearchScreen()),
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(8),
+                                    border: Border.all(
+                                        color: Theme.of(context).dividerColor),
+                                  ),
+                                  padding: const EdgeInsets.all(5),
+                                  child: Icon(Icons.search,
+                                      size: 20,
+                                      color: Theme.of(context).iconTheme.color),
+                                ),
+                              ),
                             ],
                           ),
-                        ],
-                      ),
-                    ),
+                        ),
 
-                    const SizedBox(height: 16),
+                        const SizedBox(height: 14),
 
-                    // For You header
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: Row(
-                        children: [
-                          GradientContainer(
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
-                              child: AppText("For you", fontSize: 13,
-                                  fontWeight: FontWeight.w600, color: Colors.white),
+                        // ── Empty State ──
+                        if (events.isEmpty)
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 12),
+                            child: Container(
+                              width: double.infinity,
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 20, vertical: 36),
+                              decoration: BoxDecoration(
+                                color: Theme.of(context).primaryColorDark,
+                                borderRadius: BorderRadius.circular(14),
+                                border: Border.all(
+                                    color: Theme.of(context).dividerColor),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withValues(alpha: 0.05),
+                                    blurRadius: 10,
+                                    offset: const Offset(0, 4),
+                                  ),
+                                ],
+                              ),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.all(16),
+                                    decoration: BoxDecoration(
+                                      color: Theme.of(context)
+                                          .dividerColor
+                                          .withValues(alpha: 0.5),
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: Icon(
+                                      Icons.inbox_outlined,
+                                      size: 36,
+                                      color: Colors.grey.shade400,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 16),
+                                  AppText(
+                                    "No events found",
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                  const SizedBox(height: 6),
+                                  AppText(
+                                    "There are no predictions in this\ncategory right now.",
+                                    fontSize: 13,
+                                    color: Colors.grey.shade500,
+                                  ),
+                                  const SizedBox(height: 20),
+                                  GestureDetector(
+                                    onTap: () {
+                                      setState(() => selectedCategory = 0);
+                                      context
+                                          .read<EventViewModel>()
+                                          .filterByCategory(null);
+                                    },
+                                    child: GradientContainer(
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 20, vertical: 9),
+                                        child: AppText(
+                                          "View All Events",
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.w600,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
-                          const Spacer(),
-                          Container(
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(8),
-                              border: Border.all(color: Theme.of(context).dividerColor),
-                            ),
-                            padding: const EdgeInsets.all(5),
-                            child: Icon(Icons.search, size: 20,
-                                color: Theme.of(context).iconTheme.color),
+
+                        // ── Prediction Cards ──
+                        if (events.isNotEmpty)
+                          ListView(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            children: [
+                              ...events.map((event) {
+                                return Column(children: [
+                                  event.hasSubMarkets
+                                      ? MultiMarketCard(event: event)
+                                      : SingleMarketCard(event: event),
+                                  const SizedBox(height: 12),
+                                ]);
+                              }),
+                              const SizedBox(height: 12),
+                            ],
                           ),
-                        ],
-                      ),
-                    ),
-
-                    const SizedBox(height: 14),
-
-                    // Prediction Cards
-                    ListView(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      children: const [
-                        PredictionCard(
-                          title: "SA vs NZ",
-                          team1: "South Africa",
-                          team2: "New Zealand",
-                          percent1: 60,
-                          percent2: 40,
-                          amount1: "SA ₹6.0",
-                          amount2: "NZ ₹4.0",
-                          flag1: 'assets/images/africa.png',
-                          flag2: 'assets/images/zealand.png',
-                          volume: "₹82.34 L Vol",
-                          time: "6h 58m 3s",
-                        ),
-                        SizedBox(height: 12),
-                        PredictionCard(
-                          title: "IND vs ENG",
-                          team1: "India",
-                          team2: "England",
-                          percent1: 70,
-                          percent2: 30,
-                          amount1: "IND ₹7.0",
-                          amount2: "ENG ₹3.0",
-                          flag1: 'assets/images/india.png',
-                          flag2: 'assets/images/england.png',
-                          volume: "₹18.41 L Vol",
-                          time: "3h 12m 10s",
-                        ),
-                        SizedBox(height: 12),
-                        PredictionCardType2(
-                          title: "Who will win the T20 World Cup 2026?",
-                          logo: "assets/images/circket.png",
-                          team1: "India",
-                          team2: "Australia",
-                          percent1: "50%",
-                          percent2: "5%",
-                          volume: "₹2.09 C Vol",
-                        ),
-                        SizedBox(height: 24),
                       ],
                     ),
-                  ],
-                ),
+                  );
+                },
               ),
             ),
           ],
@@ -241,13 +374,28 @@ class HomeScreen extends StatelessWidget {
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }
+
+  String _formatPool(double pool) =>
+      pool > 0 ? '₹${pool.toStringAsFixed(2)} Vol' : '₹0.00 Vol';
+
+  String _timeLeft(DateTime? endDate) {
+    if (endDate == null) return '--';
+    final diff = endDate.difference(DateTime.now());
+    if (diff.isNegative) return 'Ended';
+    final h = diff.inHours;
+    final m = diff.inMinutes % 60;
+    final s = diff.inSeconds % 60;
+    return '${h}h ${m}m ${s}s';
+  }
 }
 
-// ── CATEGORY ITEM ────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────────
+// EXISTING WIDGETS — zero UI changes
+// ─────────────────────────────────────────────────────────────────────────────
+
 class CategoryItem extends StatelessWidget {
   final String title;
   final bool selected;
-
   const CategoryItem(this.title, this.selected, {super.key});
 
   @override
@@ -284,12 +432,10 @@ class CategoryItem extends StatelessWidget {
   }
 }
 
-// ── QUICK CARD ───────────────────────────────────────────────────
 class QuickCard extends StatelessWidget {
   final String title;
   final String badge;
   final String logo;
-
   const QuickCard(this.title, this.badge, {super.key, required this.logo});
 
   @override
@@ -309,7 +455,7 @@ class QuickCard extends StatelessWidget {
               Image.asset(logo, height: 26, fit: BoxFit.contain),
               const SizedBox(width: 6),
               Expanded(
-                child: AppText(title, fontSize: 12, fontWeight: FontWeight.w500),
+                child: AppText(title, fontSize: 14, fontWeight: FontWeight.w500),
               ),
             ],
           ),
@@ -319,15 +465,15 @@ class QuickCard extends StatelessWidget {
             top: -7,
             right: 6,
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
               decoration: BoxDecoration(
                 color: const Color(0xFFe53a3b),
-                borderRadius: BorderRadius.circular(6),
+                borderRadius: BorderRadius.circular(8),
               ),
               child: Text(badge,
                   style: const TextStyle(
                       color: Colors.white,
-                      fontSize: 9,
+                      fontSize: 12,
                       fontWeight: FontWeight.bold)),
             ),
           ),
@@ -336,41 +482,22 @@ class QuickCard extends StatelessWidget {
   }
 }
 
-// ── PREDICTION CARD ──────────────────────────────────────────────
-class PredictionCard extends StatelessWidget {
-  final String title;
-  final String team1;
-  final String team2;
-  final int percent1;
-  final int percent2;
-  final String amount1;
-  final String amount2;
-  final String flag1;
-  final String flag2;
-  final String volume;
-  final String time;
 
-  const PredictionCard({
-    super.key,
-    required this.title,
-    required this.team1,
-    required this.team2,
-    required this.percent1,
-    required this.percent2,
-    required this.amount1,
-    required this.amount2,
-    required this.flag1,
-    required this.flag2,
-    required this.volume,
-    required this.time,
-  });
+// ─────────────────────────────────────────────────────────────────────────────
+// SINGLE MARKET CARD  —  matches website left card style
+// ─────────────────────────────────────────────────────────────────────────────
+
+class SingleMarketCard extends StatelessWidget {
+  final EventModel event;
+  const SingleMarketCard({super.key, required this.event});
 
   @override
   Widget build(BuildContext context) {
+    final m      = event.primaryMarket;
+    final isOpen = m?.isOpen ?? false;
+
     return GestureDetector(
-      onTap: (){
-        predictNavigator.newPage(context, page: MatchScreen());
-      },
+      onTap: () => predictNavigator.newPage(context, page: PredikDetailScreen(eventId: event.id)),
       child: Container(
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
@@ -388,132 +515,141 @@ class PredictionCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            AppText(title, fontSize: 15, fontWeight: FontWeight.w700),
-            const SizedBox(height: 14),
 
-            // Team 1
+            // ── Title row ──
             Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                CircleAvatar(radius: 15, backgroundImage: AssetImage(flag1)),
-                const SizedBox(width: 10),
-                Expanded(child: AppText(team1, fontSize: 14)),
-                AppText("$percent1%", fontSize: 14, fontWeight: FontWeight.w600),
+                Expanded(
+                  child: AppText(
+                    event.eventTitle,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                _iconBtn(Icons.star_border),
+                const SizedBox(width: 6),
+                _iconBtn(Icons.access_time_outlined),
               ],
             ),
-            const SizedBox(height: 6),
 
-            // Progress bar
+            const SizedBox(height: 14),
+
+            // ── Yes / No percentages ──
+            Row(
+              children: [
+                AppText("48%",
+                    fontSize: 15, fontWeight: FontWeight.w600),
+                const SizedBox(width: 6),
+                AppText(m?.side1 ?? 'Yes',
+                    fontSize: 14, color: Colors.green, fontWeight: FontWeight.w500),
+                const Spacer(),
+                AppText(m?.side2 ?? 'No',
+                    fontSize: 14, color: Colors.red, fontWeight: FontWeight.w500),
+                const SizedBox(width: 6),
+                AppText("52%",
+                    fontSize: 15, fontWeight: FontWeight.w600),
+              ],
+            ),
+
+            const SizedBox(height: 8),
+
+            // ── Progress bar ──
             ClipRRect(
               borderRadius: BorderRadius.circular(4),
-              child: LinearProgressIndicator(
-                value: percent1 / 100,
-                minHeight: 4,
-                backgroundColor: Colors.red.withValues(alpha: 0.2),
-                valueColor: const AlwaysStoppedAnimation<Color>(Colors.green),
+              child: Row(
+                children: [
+                  Expanded(
+                    flex: 48,
+                    child: Container(height: 5, color: Colors.green),
+                  ),
+                  Expanded(
+                    flex: 52,
+                    child: Container(height: 5, color: Colors.red),
+                  ),
+                ],
               ),
             ),
-            const SizedBox(height: 10),
 
-            // Team 2
-            Row(
-              children: [
-                CircleAvatar(radius: 15, backgroundImage: AssetImage(flag2)),
-                const SizedBox(width: 10),
-                Expanded(child: AppText(team2, fontSize: 14)),
-                AppText("$percent2%", fontSize: 14, fontWeight: FontWeight.w600),
-              ],
-            ),
             const SizedBox(height: 14),
 
-            // Bet buttons
+            // ── Yes / No bet buttons ──
             Row(
               children: [
-                Expanded(
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 10),
-                    alignment: Alignment.center,
-                    decoration: BoxDecoration(
-                      color: Colors.green.withValues(alpha: 0.12),
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(
-                          color: Colors.green.withValues(alpha: 0.3), width: 1),
-                    ),
-                    child: AppText(amount1,
-                        fontSize: 13,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.green),
-                  ),
-                ),
+                Expanded(child: _betButton(context, m?.side1 ?? 'Yes', '49¢', Colors.green)),
                 const SizedBox(width: 10),
-                Expanded(
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 10),
-                    alignment: Alignment.center,
-                    decoration: BoxDecoration(
-                      color: Colors.red.withValues(alpha: 0.12),
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(
-                          color: Colors.red.withValues(alpha: 0.3), width: 1),
-                    ),
-                    child: Text(amount2,
-                        style: const TextStyle(
-                            color: Colors.red,
-                            fontSize: 13,
-                            fontWeight: FontWeight.w700)),
-                  ),
-                ),
+                Expanded(child: _betButton(context, m?.side2 ?? 'No',  '53¢', Colors.red)),
               ],
             ),
-            const SizedBox(height: 12),
 
-            // Footer
+            const SizedBox(height: 14),
+
+            // ── Footer ──
             Row(
               children: [
-                Icon(Icons.bar_chart, size: 14, color: Colors.grey.shade500),
-                const SizedBox(width: 4),
-                AppText(volume, fontSize: 12, color: Colors.grey),
+                AppText(
+                  '\$ ${event.totalPoolInUsd.toStringAsFixed(0)} Vol',
+                  fontSize: 13,
+                  color: Colors.grey,
+                ),
                 const Spacer(),
-                const Icon(Icons.access_time, size: 13, color: Colors.grey),
-                const SizedBox(width: 4),
-                AppText(time, fontSize: 12, color: Colors.grey),
-                const SizedBox(width: 12),
-                const Icon(Icons.favorite_border, size: 16, color: Colors.grey),
+                AppText(
+                  '${event.subMarkets.length} Market${event.subMarkets.length == 1 ? '' : 's'}',
+                  fontSize: 13,
+                  color: Colors.grey,
+                ),
               ],
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _iconBtn(IconData icon) {
+    return Container(
+      padding: const EdgeInsets.all(6),
+      decoration: BoxDecoration(
+        color: Colors.grey.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Icon(icon, size: 16, color: Colors.grey),
+    );
+  }
+
+  Widget _betButton(BuildContext context, String label, String price, Color color) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 11),
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.15),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: AppText(
+        '$label $price',
+        fontSize: 14,
+        fontWeight: FontWeight.w600,
+        color: color,
       ),
     );
   }
 }
 
-// ── PREDICTION CARD TYPE 2 ───────────────────────────────────────
-class PredictionCardType2 extends StatelessWidget {
-  final String title;
-  final String logo;
-  final String team1;
-  final String team2;
-  final String percent1;
-  final String percent2;
-  final String volume;
+// ─────────────────────────────────────────────────────────────────────────────
+// MULTI MARKET CARD  —  matches website right card style
+// ─────────────────────────────────────────────────────────────────────────────
 
-  const PredictionCardType2({
-    super.key,
-    required this.title,
-    required this.logo,
-    required this.team1,
-    required this.team2,
-    required this.percent1,
-    required this.percent2,
-    required this.volume,
-  });
+class MultiMarketCard extends StatelessWidget {
+  final EventModel event;
+  const MultiMarketCard({super.key, required this.event});
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: (){
-        predictNavigator.newPage(context, page: PredikDetailScreen());
-      },
+      onTap: () => predictNavigator.newPage(context, page: PredikDetailScreen(eventId: event.id)),
       child: Container(
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
@@ -532,52 +668,68 @@ class PredictionCardType2 extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
 
-            // Title
+            // ── Title row ──
             Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(6),
-                  child: Image.asset(logo, height: 34, width: 34, fit: BoxFit.cover),
-                ),
-                const SizedBox(width: 10),
                 Expanded(
-                  child: AppText(title, fontSize: 14, fontWeight: FontWeight.w600),
+                  child: AppText(
+                    event.eventTitle,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
-              ],
-            ),
-            const SizedBox(height: 14),
-
-            // Team 1
-            Row(
-              children: [
-                Expanded(child: AppText(team1, fontSize: 14)),
-                AppText(percent1,
-                    fontSize: 14, fontWeight: FontWeight.w700, color: Colors.green),
-                const SizedBox(width: 10),
-                _betBtn("Yes", Colors.green),
+                const SizedBox(width: 8),
+                _iconBtn(Icons.star_border),
                 const SizedBox(width: 6),
-                _betBtn("No", Colors.red),
+                _iconBtn(Icons.access_time_outlined),
               ],
             ),
-            const SizedBox(height: 10),
 
-            // Team 2
-            Row(
-              children: [
-                Expanded(child: AppText(team2, fontSize: 14)),
-                AppText(percent2, fontSize: 14, fontWeight: FontWeight.w700),
-              ],
-            ),
             const SizedBox(height: 14),
 
-            // Footer
+            // ── Sub-market rows (max 3 shown) ──
+            ...event.subMarkets.take(3).map((m) => Padding(
+              padding: const EdgeInsets.only(bottom: 10),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: AppText(
+                      m.name,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w400,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  _betBtn(context, m.side1, Colors.green),
+                  const SizedBox(width: 6),
+                  _betBtn(context, m.side2, Colors.red),
+                ],
+              ),
+            )),
+
+            const SizedBox(height: 4),
+            Divider(color: Theme.of(context).dividerColor, thickness: 1),
+            const SizedBox(height: 8),
+
+            // ── Footer ──
             Row(
               children: [
-                Icon(Icons.bar_chart, size: 14, color: Colors.grey.shade500),
-                const SizedBox(width: 4),
-                AppText(volume, fontSize: 12, color: Colors.grey),
+                AppText(
+                  '\$ ${event.totalPoolInUsd.toStringAsFixed(0)} Vol',
+                  fontSize: 13,
+                  color: Colors.grey,
+                ),
                 const Spacer(),
-                const Icon(Icons.favorite_border, size: 16, color: Colors.grey),
+                AppText(
+                  '${event.subMarkets.length} Market${event.subMarkets.length == 1 ? '' : 's'}',
+                  fontSize: 13,
+                  color: Colors.grey,
+                ),
               ],
             ),
           ],
@@ -586,17 +738,32 @@ class PredictionCardType2 extends StatelessWidget {
     );
   }
 
-  Widget _betBtn(String label, Color color) {
+  Widget _iconBtn(IconData icon) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+      padding: const EdgeInsets.all(6),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(6),
-        border: Border.all(color: color.withValues(alpha: 0.3), width: 1),
+        color: Colors.grey.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(8),
       ),
-      child: Text(label,
-          style: TextStyle(
-              color: color, fontSize: 13, fontWeight: FontWeight.w600)),
+      child: Icon(icon, size: 16, color: Colors.grey),
+    );
+  }
+
+  Widget _betBtn(BuildContext context, String label, Color color) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.15),
+        borderRadius: BorderRadius.circular(6),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(
+          color: color,
+          fontSize: 13,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
     );
   }
 }

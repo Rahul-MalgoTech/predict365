@@ -2,7 +2,7 @@ abstract class BaseApiService {
 
   // final String baseUrl = "https://bondingbackend.onrender.com/api/v1/";
   // final String baseUrl = "https://api.voicey.in/api/v1/";
-  final String baseUrl = "http://192.168.0.22:7000/api/v1/";
+  final String baseUrl = "https://staging-api.predict365.com/api/";
 
   final String baseUrlV2 = "";
 

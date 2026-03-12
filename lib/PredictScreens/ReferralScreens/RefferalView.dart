@@ -64,24 +64,23 @@ class ReferEarnScreen extends StatelessWidget {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text(
+                              AppText(
                                 "Invite a Friend and Earn\nLifetime Rewards!",
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 17,
-                                    fontWeight: FontWeight.w700),
+                                color: Colors.white,
+                                fontSize: 18,
+                                fontWeight: FontWeight.w600,
                               ),
                               const SizedBox(height: 10),
-                              Text(
+                              AppText(
                                 "Get a 5% bonus on their first deposit, plus up to 20% commission on every winning.",
-                                style: TextStyle(
-                                    color: Colors.white.withValues(alpha: 0.85),
-                                    fontSize: 13),
+                                color: Colors.white.withValues(alpha: 0.85),
+                                fontSize: 16,
+                                maxLines: 5,
                               ),
                             ],
                           ),
                         ),
-                        Image.asset("assets/images/referfriend.png", height: 100),
+                        Image.asset("assets/images/referfriend.png"),
                       ],
                     ),
                   ],
@@ -145,7 +144,7 @@ class ReferEarnScreen extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      AppText("My invitation code", fontSize: 14, fontWeight: FontWeight.w600),
+                      AppText("My invitation code", fontSize: 18, fontWeight: FontWeight.w600),
                       const SizedBox(height: 12),
                       Row(
                         children: [
@@ -222,7 +221,7 @@ class _BonusItem extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        AppText(title, fontSize: 12, color: Colors.grey),
+        AppText(title, fontSize: 15, color: Colors.grey),
         const SizedBox(height: 5),
         AppText(value, fontSize: 14, fontWeight: FontWeight.w600),
       ],
@@ -252,9 +251,10 @@ class _InfoCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            AppText(title, fontSize: 14, fontWeight: FontWeight.w600),
+            AppText(title, fontSize: 18, fontWeight: FontWeight.w600),
             const SizedBox(height: 6),
-            AppText(desc, fontSize: 13, color: Colors.grey),
+            AppText(desc, fontSize: 15, color: Colors.grey,
+            maxLines: 2,),
           ],
         ),
       ),
@@ -283,19 +283,19 @@ class _CommissionBonusCard extends StatelessWidget {
           children: [
             Row(
               children: [
-                AppText("Commission Bonus", fontSize: 14, fontWeight: FontWeight.w600),
+                AppText("Commission Bonus", fontSize: 18, fontWeight: FontWeight.w600),
                 const Spacer(),
-                const Icon(Icons.help_outline, size: 16, color: Colors.grey),
+                const Icon(Icons.help_outline, size: 20, color: Colors.grey),
               ],
             ),
             const SizedBox(height: 14),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                AppText("Level", fontSize: 12, fontWeight: FontWeight.w600, color: Colors.grey),
-                AppText("A Level", fontSize: 12, fontWeight: FontWeight.w600, color: Colors.grey),
-                AppText("B Level", fontSize: 12, fontWeight: FontWeight.w600, color: Colors.grey),
-                AppText("C Level", fontSize: 12, fontWeight: FontWeight.w600, color: Colors.grey),
+                AppText("Level", fontSize: 15, fontWeight: FontWeight.w600, color: Colors.black87),
+                AppText("A Level", fontSize: 15, fontWeight: FontWeight.w600, color: Colors.black87),
+                AppText("B Level", fontSize: 15, fontWeight: FontWeight.w600, color: Colors.black87),
+                AppText("C Level", fontSize: 15, fontWeight: FontWeight.w600, color: Colors.black87),
               ],
             ),
             Divider(height: 20, color: theme.dividerColor),
@@ -324,10 +324,10 @@ class _CommissionRow extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          AppText(level, fontSize: 13),
-          AppText(a, fontSize: 13),
-          AppText(b, fontSize: 13),
-          AppText(c, fontSize: 13),
+          AppText(level, fontSize: 14),
+          AppText(a, fontSize: 14),
+          AppText(b, fontSize: 14),
+          AppText(c, fontSize: 14),
         ],
       ),
     );
@@ -354,9 +354,9 @@ class _MilestoneRewardsCard extends StatelessWidget {
           children: [
             Row(
               children: [
-                AppText("Milestone Invite Rewards", fontSize: 14, fontWeight: FontWeight.w600),
+                AppText("Milestone Invite Rewards", fontSize: 18, fontWeight: FontWeight.w600),
                 const Spacer(),
-                const Icon(Icons.help_outline, size: 16, color: Colors.grey),
+                const Icon(Icons.help_outline, size: 20, color: Colors.grey),
               ],
             ),
             const SizedBox(height: 14),
@@ -374,7 +374,7 @@ class _MilestoneRewardsCard extends StatelessWidget {
               itemCount: 10,
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 4,
-                mainAxisSpacing: 12,
+                mainAxisSpacing: 15,
                 crossAxisSpacing: 12,
               ),
               itemBuilder: (_, i) {
@@ -382,8 +382,8 @@ class _MilestoneRewardsCard extends StatelessWidget {
                   children: [
                     Image.asset("assets/images/coin.png", height: 28),
                     const SizedBox(height: 4),
-                    AppText("₹100.00", fontSize: 10),
-                    AppText("0/3", fontSize: 10, color: Colors.grey),
+                    AppText("₹100.00", fontSize: 14),
+                    AppText("0/3", fontSize: 12, color: Colors.grey),
                   ],
                 );
               },

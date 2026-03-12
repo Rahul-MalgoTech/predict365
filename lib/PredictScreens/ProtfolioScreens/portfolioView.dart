@@ -39,8 +39,8 @@ class PortfolioScreen extends StatelessWidget {
                         ),
                       ),
                     ),
-                    labelStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
-                    unselectedLabelStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.w400),
+                    labelStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                    unselectedLabelStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w400),
                     labelColor: theme.colorScheme.surfaceBright,
                     unselectedLabelColor: Colors.grey,
                     tabs: const [
@@ -88,7 +88,7 @@ class PortfolioScreen extends StatelessWidget {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    AppText("Total Investment", fontSize: 13, color: Colors.grey),
+                    AppText("Total Investment", fontSize: 14, color: Colors.grey),
                     const SizedBox(height: 6),
                     AppText("₹0.00", fontSize: 24, fontWeight: FontWeight.bold),
                   ],
@@ -99,7 +99,7 @@ class PortfolioScreen extends StatelessWidget {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    AppText("Current Value", fontSize: 13, color: Colors.grey),
+                    AppText("Current Value", fontSize: 14, color: Colors.grey),
                     const SizedBox(height: 6),
                     Row(
                       children: [
@@ -110,7 +110,7 @@ class PortfolioScreen extends StatelessWidget {
                       ],
                     ),
                     const SizedBox(height: 4),
-                    AppText("Returns: +₹0.00", fontSize: 12, color: Colors.grey),
+                    AppText("Returns: +₹0.00", fontSize: 14, color: Colors.grey),
                   ],
                 ),
               ],
@@ -121,13 +121,13 @@ class PortfolioScreen extends StatelessWidget {
         const SizedBox(height: 16),
 
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
+          padding: const EdgeInsets.symmetric(horizontal: 10),
           child: Row(
             children: [
               GradientContainer(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
                 child: AppText("Matched Orders",
-                    color: Colors.white, fontWeight: FontWeight.w600, fontSize: 13),
+                    color: Colors.white, fontWeight: FontWeight.w600, fontSize: 16),
               ),
               const SizedBox(width: 10),
               Container(
@@ -137,7 +137,7 @@ class PortfolioScreen extends StatelessWidget {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: AppText("Unmatched Orders",
-                    color: Colors.grey, fontWeight: FontWeight.w500, fontSize: 13),
+                    color: Colors.grey.shade700, fontWeight: FontWeight.w500, fontSize: 16),
               ),
             ],
           ),

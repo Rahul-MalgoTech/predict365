@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:predict365/PredictScreens/DepositWithdrawScreen/DepositWithdrawScreen.dart';
 import 'package:predict365/Predict_Utils/App_Theme/App_Theme.dart';
 import 'package:predict365/Reusable_Widgets/AppText_Theme/AppText_Theme.dart';
+import 'package:predict365/Reusable_Widgets/BondingNavigator.dart';
 import 'package:predict365/Reusable_Widgets/ReuseableGradientContainer/ReusableGradientContainer.dart';
 import 'package:provider/provider.dart';
 
@@ -22,6 +24,8 @@ class _RankingScreenState extends State<RankingScreen> {
     {'rank': '2', 'user': 'User695498', 'profit': '53982.10', 'avatar': 'assets/images/rank2.png'},
     {'rank': '3', 'user': 'User933818', 'profit': '46053.93', 'avatar': 'assets/images/rankingprofile.png'},
     {'rank': '4', 'user': 'User933818', 'profit': '46053.93', 'avatar': 'assets/images/rank2.png'},
+    {'rank': '5', 'user': 'User933818', 'profit': '46053.93', 'avatar': 'assets/images/rankingprofile.png'},
+    {'rank': '6', 'user': 'User933818', 'profit': '46053.93', 'avatar': 'assets/images/rank2.png'},
   ];
 
   final List<String> categories = ['Trending', 'Cricket', 'Crypto', 'Politics', 'Sports', 'Entertainment'];
@@ -39,34 +43,39 @@ class _RankingScreenState extends State<RankingScreen> {
 
             // ── TOP BAR ──
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
               child: Row(
                 children: [
                   Image.asset(
                     isDark
                         ? "assets/images/predictlogowhite.png"
                         : "assets/images/predictlogo.png",
-                    height: 20,
+                    height: 22,
                   ),
                   const Spacer(),
-                  Container(
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).primaryColorDark,
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: Theme.of(context).dividerColor),
-                    ),
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
-                    child: Row(
-                      children: [
-                        AppText("₹0.00", fontSize: 13, fontWeight: FontWeight.w600),
-                        const SizedBox(width: 8),
-                        GradientContainer(
-                          child: const Padding(
-                            padding: EdgeInsets.all(4),
-                            child: Icon(Icons.add, size: 16, color: Colors.white),
+                  GestureDetector(
+                    onTap: (){
+                      predictNavigator.newPage(context, page: DepositScreen());
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).primaryColorDark,
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: Theme.of(context).dividerColor),
+                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+                      child: Row(
+                        children: [
+                          AppText("₹0.00", fontSize: 13, fontWeight: FontWeight.w600),
+                          const SizedBox(width: 8),
+                          GradientContainer(
+                            child: const Padding(
+                              padding: EdgeInsets.all(4),
+                              child: Icon(Icons.add, size: 16, color: Colors.white),
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                   const SizedBox(width: 10),
@@ -98,11 +107,11 @@ class _RankingScreenState extends State<RankingScreen> {
                       padding: const EdgeInsets.only(right: 20),
                       child: AppText(
                         categories[i],
-                        fontSize: 14,
+                        fontSize: 16,
                         color: isSelected
                             ? Theme.of(context).textTheme.labelLarge!.color
-                            : Colors.grey,
-                        fontWeight: isSelected ? FontWeight.w700 : FontWeight.w400,
+                            : Colors.grey.shade600,
+                        fontWeight: isSelected ? FontWeight.w500 : FontWeight.w400,
                       ),
                     ),
                   );
@@ -148,13 +157,13 @@ class _RankingScreenState extends State<RankingScreen> {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        AppText("Short of the list", fontSize: 13),
+                        AppText("Short of the list", fontSize: 15,color: Colors.grey.shade500),
                         const SizedBox(height: 3),
-                        AppText("₹11,878.88", fontSize: 12, color: Colors.grey),
+                        AppText("₹11,878.88", fontSize: 18, fontWeight: FontWeight.w500),
                       ],
                     ),
                     const Spacer(),
-                    AppText("₹0.00", fontSize: 14, fontWeight: FontWeight.bold),
+                    AppText("₹0.00", fontSize: 18, fontWeight: FontWeight.bold),
                   ],
                 ),
               ),
@@ -199,10 +208,10 @@ class _RankingScreenState extends State<RankingScreen> {
                     },
                     child: Row(
                       children: [
-                        AppText("Profit", fontSize: 14, fontWeight: FontWeight.w600),
+                        AppText("Profit", fontSize: 16, fontWeight: FontWeight.w600),
                         Icon(
                           profitAscending ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
-                          size: 18,
+                          size: 20,
                         ),
                       ],
                     ),
@@ -223,12 +232,12 @@ class _RankingScreenState extends State<RankingScreen> {
                               ? GradientContainer(
                             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                             margin: const EdgeInsets.symmetric(horizontal: 2),
-                            child: AppText(f, fontSize: 12, color: Colors.white),
+                            child: AppText(f, fontSize: 15, color: Colors.white),
                           )
                               : Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                             margin: const EdgeInsets.symmetric(horizontal: 2),
-                            child: AppText(f, fontSize: 12, color: Colors.grey),
+                            child: AppText(f, fontSize: 15, color: Colors.grey.shade600),
                           ),
                         );
                       }).toList(),
@@ -281,9 +290,9 @@ class _RankingScreenState extends State<RankingScreen> {
         children: [
           AppText(
             label,
-            fontSize: 15,
-            fontWeight: isSelected ? FontWeight.w700 : FontWeight.w400,
-            color: isSelected ? null : Colors.grey,
+            fontSize: 16,
+            fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+            color: isSelected ? null : Colors.grey.shade600,
           ),
           const SizedBox(height: 5),
           if (isSelected)
@@ -342,7 +351,7 @@ class LeaderItem extends StatelessWidget {
           Stack(
             clipBehavior: Clip.none,
             children: [
-              CircleAvatar(radius: 20, backgroundImage: AssetImage(avatar)),
+              CircleAvatar(radius: 22, backgroundImage: AssetImage(avatar)),
               Positioned(
                 bottom: -2, right: -2,
                 child: Container(
@@ -362,8 +371,8 @@ class LeaderItem extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               AppText(profit,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w700,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
                   color: const Color(0xFF2fc070)),
               const SizedBox(height: 5),
               Container(

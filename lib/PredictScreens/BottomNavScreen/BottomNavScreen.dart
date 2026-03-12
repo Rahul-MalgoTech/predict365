@@ -33,23 +33,26 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
 
       body: pages[selectedIndex],
 
-      bottomNavigationBar: SafeArea(
-        child: Container(
-          height: 70,
-          decoration:  BoxDecoration(
-            color: Theme.of(context).scaffoldBackgroundColor,
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-        
-              bottomItem(0,"assets/images/predicthome.png","Explore"),
-              bottomItem(1,"assets/images/rank.png","Ranking"),
-              bottomItem(2,"assets/images/refer.png","Referral"),
-              bottomItem(3,"assets/images/port.png","Portfolio"),
-              bottomItem(4,"assets/images/profile.png","Me"),
-        
-            ],
+      bottomNavigationBar: Container(
+        color: Theme.of(context).scaffoldBackgroundColor,
+        child: SafeArea(
+          child: Container(
+            height: 70,
+            decoration:  BoxDecoration(
+              color: Theme.of(context).scaffoldBackgroundColor,
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+
+                bottomItem(0,"assets/images/predicthome.png","Explore"),
+                bottomItem(1,"assets/images/rank.png","Ranking"),
+                bottomItem(2,"assets/images/refer.png","Referral"),
+                bottomItem(3,"assets/images/port.png","Portfolio"),
+                bottomItem(4,"assets/images/profile.png","Me"),
+
+              ],
+            ),
           ),
         ),
       ),

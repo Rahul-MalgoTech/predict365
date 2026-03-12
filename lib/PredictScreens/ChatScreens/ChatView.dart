@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:predict365/Predict_Utils/App_Theme/App_Theme.dart';
 import 'package:predict365/Reusable_Widgets/AppText_Theme/AppText_Theme.dart';
+import 'package:predict365/Reusable_Widgets/BondingNavigator.dart';
 import 'package:provider/provider.dart';
 
 class ChatsScreen extends StatelessWidget {
@@ -23,7 +24,7 @@ class ChatsScreen extends StatelessWidget {
     final div    = isDark ? Colors.grey.shade800 : Colors.grey.shade200;
 
     return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor.withOpacity(0.99),
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -45,7 +46,12 @@ class ChatsScreen extends StatelessWidget {
                   const Spacer(),
                   ThemeToggleIcon(),
                   const SizedBox(width: 14),
-                  Icon(Icons.close, color: txt, size: 24),
+                  GestureDetector(
+                      onTap: (){
+                        predictNavigator.backPage(context);
+                      },
+
+                      child: Icon(Icons.close, color: txt, size: 24)),
                 ],
               ),
             ),

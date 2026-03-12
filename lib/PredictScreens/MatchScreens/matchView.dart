@@ -58,7 +58,9 @@ class _MatchScreenState extends State<MatchScreen> {
   }
 
   bool get showWinnerDetail => activeTab == 'Winner';
+  int selectedCategory = 0;
 
+  final List<String> categories = ['Trending', 'Cricket', 'Crypto', 'Politics', 'Sports', 'Entertainment'];
   @override
   Widget build(BuildContext context) {
     final isDark = context.watch<ThemeController>().isDarkMode;
@@ -69,7 +71,7 @@ class _MatchScreenState extends State<MatchScreen> {
     ));
 
     return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor.withOpacity(0.98),
       body: SafeArea(
         child: Center(
           // On web, cap max width so content doesn't stretch too wide
@@ -136,26 +138,26 @@ class _MatchScreenState extends State<MatchScreen> {
               child: Stack(
                 children: [
                   Positioned.fill(
-                    child: Image.asset('assets/images/marketbgo.png', fit: BoxFit.cover),
+                    child: Image.asset('assets/images/marketbg.png', fit: BoxFit.cover),
                   ),
                   Positioned.fill(
                     child: Container(
                       color: isDark
-                          ? Colors.black.withValues(alpha: 0.35)
-                          : Colors.white.withValues(alpha: 0.55),
+                          ? Color(0XFf1b1d24).withValues(alpha: 0.9)
+                          : Colors.white.withValues(alpha: 0.25),
                     ),
                   ),
                   Padding(
                     padding: EdgeInsets.symmetric(vertical: 14, horizontal: 16),
                     child: Column(
                       children: [
-                        Text(
+                        AppText(
                           '7:00 PM',
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                            color: isDark ? Colors.white70 : Colors.black87,
-                          ),
+
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                          color: isDark ? Colors.white70 : Colors.black87,
+
                         ),
                         SizedBox(height: 12),
                         Row(
@@ -177,13 +179,13 @@ class _MatchScreenState extends State<MatchScreen> {
                                   ),
                                 ),
                                 SizedBox(height: 6),
-                                Text('India', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14, color: isDark ? Colors.white : Colors.black)),
+                                AppText('India',fontWeight: FontWeight.w600, fontSize: 16, color: isDark ? Colors.white : Colors.black),
                               ],
                             ),
                             // Center
                             Column(
                               children: [
-                                Text('60%-40%', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 22, color: Colors.black)),
+                                AppText('60%-40%', fontWeight: FontWeight.w700, fontSize: 24, ),
                                 SizedBox(height: 6),
                                 Row(
                                   mainAxisSize: MainAxisSize.min,
@@ -194,7 +196,7 @@ class _MatchScreenState extends State<MatchScreen> {
                                   ],
                                 ),
                                 SizedBox(height: 6),
-                                Text('₹85.73L Vol', style: TextStyle(fontSize: 11, color: isDark ? Colors.white70 : Colors.black87)),
+                                AppText('₹85.73L Vol',fontSize: 14, color: isDark ? Colors.white70 : Colors.black87),
                               ],
                             ),
                             // England
@@ -213,7 +215,7 @@ class _MatchScreenState extends State<MatchScreen> {
                                   ),
                                 ),
                                 SizedBox(height: 6),
-                                Text('England', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14, color: isDark ? Colors.white : Colors.black)),
+                                AppText('England', fontWeight: FontWeight.w600, fontSize: 16, color: isDark ? Colors.white : Colors.black),
                               ],
                             ),
                           ],
@@ -248,13 +250,13 @@ class _MatchScreenState extends State<MatchScreen> {
                       borderRadius: BorderRadius.circular(11),
                       border: Border.all(color: isActive ? Colors.transparent : Theme.of(context).dividerColor),
                     ),
-                    child: Text(
+                    child: AppText(
                       tab,
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: isActive ? FontWeight.w700 : FontWeight.w500,
-                        color: isActive ? (isDark ? Colors.black : Colors.white) : Colors.grey,
-                      ),
+
+                      fontSize: 16,
+                      fontWeight: isActive ? FontWeight.w700 : FontWeight.w500,
+                      color: isActive ? (isDark ? Colors.black : Colors.white) : Colors.grey,
+
                     ),
                   ),
                 );
@@ -283,13 +285,13 @@ class _MatchScreenState extends State<MatchScreen> {
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Expanded(child: AppText(q.question, fontWeight: FontWeight.w700, fontSize: 14)),
+              Expanded(child: AppText(q.question, fontWeight: FontWeight.w500, fontSize: 17)),
               SizedBox(width: 8),
-              AppText('${q.probability}%', fontWeight: FontWeight.w700, fontSize: 14),
+              AppText('${q.probability}%', fontWeight: FontWeight.w700, fontSize: 18),
             ],
           ),
           SizedBox(height: 4),
-          AppText(q.volume, fontSize: 12, color: Colors.grey),
+          AppText(q.volume, fontSize: 14, color: Colors.grey),
           SizedBox(height: 12),
           // On tablet/web — buttons get more padding
           Row(
@@ -299,12 +301,12 @@ class _MatchScreenState extends State<MatchScreen> {
                   padding: EdgeInsets.symmetric(vertical: 10),
                   decoration: BoxDecoration(
                     color: Colors.green.withValues(alpha: 0.12),
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(6),
                   ),
                   child: Center(
-                    child: Text(
+                    child: AppText(
                       '${q.yesLabel} ${q.yesOdds}',
-                      style: TextStyle(color: Colors.green, fontWeight: FontWeight.w700, fontSize: 14),
+                      color: Colors.green, fontWeight: FontWeight.w600, fontSize: 16,
                     ),
                   ),
                 ),
@@ -315,12 +317,12 @@ class _MatchScreenState extends State<MatchScreen> {
                   padding: EdgeInsets.symmetric(vertical: 10),
                   decoration: BoxDecoration(
                     color: Colors.red.withValues(alpha: 0.10),
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(6),
                   ),
                   child: Center(
-                    child: Text(
+                    child: AppText(
                       '${q.noLabel} ${q.noOdds}',
-                      style: TextStyle(color: Colors.red, fontWeight: FontWeight.w700, fontSize: 14),
+                      color: Colors.red, fontWeight: FontWeight.w600, fontSize: 16,
                     ),
                   ),
                 ),
@@ -463,7 +465,7 @@ class _MatchScreenState extends State<MatchScreen> {
           ),
           child: Row(
             children: [
-              AppText('India', fontSize: 13),
+              AppText('India', fontSize: 16),
               const Spacer(),
               Icon(Icons.keyboard_arrow_down, size: 16, color: Colors.grey.shade500),
             ],
@@ -639,7 +641,7 @@ class _MatchScreenState extends State<MatchScreen> {
               children: [
                 Row(children: [
                   AppText(comment['user'] as String, fontSize: 13, fontWeight: FontWeight.w600),
-                   Spacer(),
+                  Spacer(),
                   AppText(comment['time'] as String, fontSize: 11, color: Colors.grey),
                 ]),
                 SizedBox(height: 4),

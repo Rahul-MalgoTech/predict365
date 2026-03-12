@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:predict365/APIService/Remote/AppException.dart';
 import 'package:predict365/APIService/Remote/network/BaseApiService.dart' show BaseApiService;
 import 'package:http/http.dart' as http;
+import 'package:predict365/AuthStorage/authStorage.dart';
 // import 'package:prod/APIService/Remote/AppException.dart';
 
 
@@ -12,9 +13,10 @@ class NetworkApiService extends BaseApiService {
   Future getResponse(String url) async {
     print("efcdececdecc");
     // final String? token = await AuthService.getToken();
+    final String? token = await AuthStorage.instance.getToken();
     dynamic responseJson;
     Map<String, String> headers = {
-      "Authorization": "Bearer ",
+      "Authorization": "Bearer $token",
     }; // add token
     try {
       print("evceadcc");
@@ -276,6 +278,29 @@ class NetworkApiService extends BaseApiService {
       throw FetchDataException('No Internet Connection');
     }
     return responseJson;
+  }
+
+
+
+  // ── Add this method to NetworkApiService (or replace existing putResponse) ──
+// lib/Network/NetworkApiService.dart
+
+  Future<Map<String, dynamic>> putResponse(
+      String url, {
+        required Map<String, dynamic> body,
+      }) async {
+    final String? token = await AuthStorage.instance.getToken();
+    final response = await http.put(
+      Uri.parse(baseUrl + url),
+      headers: {
+        "Content-Type":  "application/json",
+        "Accept":        "application/json",
+        "Authorization": "Bearer $token",   // ← token was missing before
+      },
+      body: json.encode(body),
+    );
+    print("PUT ${baseUrl + url} → ${response.statusCode}: ${response.body}");
+    return json.decode(response.body) as Map<String, dynamic>;
   }
 
   @override
@@ -556,22 +581,7 @@ class NetworkApiService extends BaseApiService {
     return responseJson;
   }
 
-  Future<Map<String, dynamic>> putResponse(
-    String url, {
-    required Map<String, dynamic> body,
-  }) async {
-    // final token = await AuthService.getToken();
-    final response = await http.put(
-      Uri.parse(baseUrl + url),
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer ",
-      },
-      body: json.encode(body),
-    );
-    print("${response.body}");
-    return json.decode(response.body);
-  }
+
 
   // Future postResponseTempBearPull(String url,
   //     {Map<String, dynamic>? body}) async {

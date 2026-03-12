@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:predict365/Predict_Utils/App_Theme/App_Theme.dart';
 import 'package:predict365/Reusable_Widgets/AppText_Theme/AppText_Theme.dart';
+import 'package:predict365/Reusable_Widgets/ReuseElevateButton/ReuseElevateButton.dart';
 import 'package:provider/provider.dart';
 
 class DepositScreen extends StatefulWidget {
@@ -40,7 +41,7 @@ class _DepositScreenState extends State<DepositScreen> {
     ));
 
     return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor.withOpacity(0.99),
       body: SafeArea(
         child: Column(
           children: [
@@ -58,7 +59,7 @@ class _DepositScreenState extends State<DepositScreen> {
                     child: Container(
                       height: 40,
                       decoration: BoxDecoration(
-                        color: isDark ? Colors.grey[850] : Colors.grey[200],
+                        color: isDark ? Theme.of(context).primaryColorDark : Colors.grey[200],
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Row(
@@ -99,9 +100,9 @@ class _DepositScreenState extends State<DepositScreen> {
                   children: [
                     const SizedBox(height: 24),
 
-                    Text(
+                    AppText(
                       'Deposit Amount',
-                      style: TextStyle(fontSize: 13, color: Colors.grey.shade500),
+                fontSize: 16, color: Colors.grey.shade500,
                     ),
                     const SizedBox(height: 6),
 
@@ -115,13 +116,13 @@ class _DepositScreenState extends State<DepositScreen> {
                     ),
                     const SizedBox(height: 4),
 
-                    Text(
+                    AppText(
                       'Extra +₹15.00',
-                      style: TextStyle(
-                        fontSize: 13,
+
+                        fontSize: 15,
                         fontWeight: FontWeight.w600,
                         color: Colors.green.shade600,
-                      ),
+
                     ),
                     const SizedBox(height: 20),
 
@@ -140,11 +141,11 @@ class _DepositScreenState extends State<DepositScreen> {
                                 Container(
                                   padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                                   decoration: BoxDecoration(
-                                    color: isSelected ? Colors.transparent : (isDark ? Colors.grey[850] : Colors.grey[100]),
+                                    color: isSelected ? Colors.transparent : (isDark ? Theme.of(context).primaryColorDark : Colors.grey[200]),
                                     borderRadius: BorderRadius.circular(20),
                                     border: Border.all(
                                       color: isSelected ? Colors.green : (isDark ? Colors.grey[700]! : Colors.grey[300]!),
-                                      width: isSelected ? 2 : 1,
+                                      width: isSelected ? 1 : 1,
                                     ),
                                   ),
                                   child: Text(
@@ -168,7 +169,7 @@ class _DepositScreenState extends State<DepositScreen> {
                                       ),
                                       child: Text(
                                         a['bonus'],
-                                        style: const TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.bold),
+                                        style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
                                       ),
                                     ),
                                   ),
@@ -198,7 +199,10 @@ class _DepositScreenState extends State<DepositScreen> {
                               text: const TextSpan(
                                 style: TextStyle(fontSize: 13, color: Colors.black87),
                                 children: [
-                                  TextSpan(text: 'Complete your first deposit and get a '),
+                                  TextSpan(text: 'Complete your first deposit and get a ',
+                                    style: TextStyle( fontSize: 14),
+
+                                  ),
                                   TextSpan(
                                     text: '3% bonus.',
                                     style: TextStyle(color: Colors.orange, fontWeight: FontWeight.w700),
@@ -223,7 +227,7 @@ class _DepositScreenState extends State<DepositScreen> {
                           margin: const EdgeInsets.only(bottom: 12),
                           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
                           decoration: BoxDecoration(
-                            color: isDark ? Colors.grey[900] : Colors.grey[100],
+                            color: isDark ? Theme.of(context).primaryColorDark : Colors.grey[200],
                             borderRadius: BorderRadius.circular(10),
                           ),
                           child: Row(
@@ -248,18 +252,18 @@ class _DepositScreenState extends State<DepositScreen> {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text(
+                                    AppText(
                                       m['name']!,
-                                      style: TextStyle(
-                                        fontSize: 14,
+
+                                        fontSize: 16,
                                         fontWeight: FontWeight.w600,
                                         color: isDark ? Colors.white : Colors.black,
-                                      ),
+
                                     ),
                                     const SizedBox(height: 3),
-                                    Text(
+                                    AppText(
                                       m['range']!,
-                                      style: TextStyle(fontSize: 12, color: Colors.grey.shade500),
+                                      fontSize: 14, color: Colors.grey.shade500,
                                     ),
                                   ],
                                 ),
@@ -308,29 +312,13 @@ class _DepositScreenState extends State<DepositScreen> {
           padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
           child: SizedBox(
             height: 52,
-            child: GestureDetector(
-              onTap: () {},
-              child: Container(
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFF977032), Color(0xFFF5A623)],
-                    begin: Alignment.centerLeft,
-                    end: Alignment.centerRight,
-                  ),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: const Center(
-                  child: Text(
-                    'Continue',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-              ),
-            ),
+              child: ReuseElevatedButton(
+                onTap: (){},
+
+                text: "Continue",gradientColors: [
+                Color(0xFF977032), Color(0xFFF5A623),
+
+              ],)
           ),
         ),
       ),
@@ -375,13 +363,13 @@ class _DepositScreenState extends State<DepositScreen> {
         children: [
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 10),
-            child: Text(
+            child: AppText(
               label,
-              style: TextStyle(
-                fontSize: 15,
-                fontWeight: isActive ? FontWeight.w700 : FontWeight.w500,
+
+                fontSize: 16,
+                fontWeight: isActive ? FontWeight.w600 : FontWeight.w500,
                 color: isActive ? Theme.of(context).textTheme.labelLarge!.color : Colors.grey,
-              ),
+
             ),
           ),
           if (isActive)

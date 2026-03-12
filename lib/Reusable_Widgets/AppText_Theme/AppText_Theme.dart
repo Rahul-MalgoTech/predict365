@@ -47,7 +47,6 @@ class _AppTextState extends State<AppText> {
             letterSpacing: widget.letterSpacing??-0.2,
             overflow: widget.overflow,
             fontWeight: widget.fontWeight,
-
           ),
       overflow: widget.overflow,
       maxLines: widget.maxLines,
