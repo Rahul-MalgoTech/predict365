@@ -9,89 +9,22 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="ef881180-111e-4c11-9554-3295fb13d7a5" name="Changes" comment="home,rank,refer ui">
-      <change afterPath="$PROJECT_DIR$/assets/images/graph.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/images/marketback.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/AuthStorage/authStorage.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/AuthStorage/magicAuthService.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/Models/AuthModel.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/Models/CategoryModel.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/Models/EventModel.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/Models/MarketChartModel.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/Models/UserModel.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/PredictScreens/ChatScreens/ChatView.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/PredictScreens/HomeScreens/SearchView.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/PredictScreens/PredictionDetailScreens/BuyScreens/BuyDrawerView.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/PredictScreens/PredictionDetailScreens/Chart/PriceLineChart.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/PredictScreens/PredictionDetailScreens/predictionDetailView.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/PredictScreens/ProfileScreens/ChangeProfileView.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/PredictScreens/ProfileScreens/EditProfileView.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/PredictScreens/ProfileScreens/ProfileSettingView.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/PredictScreens/RegisterScreens/OtpVerifyScreen.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/PredictScreens/RegisterScreens/RegisterView.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/PredictScreens/TransactionScreens/TransactionView.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/PredictScreens/WatchListScreens/watchlistView.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/Repository/CategoryRepository.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/Repository/EventRespository.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/Repository/MarketChartRepository.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/Repository/UserRepository.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/Repository/authRepository.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/Reusable_Widgets/ShimmerLoaderWidget/ShimmerWidget.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/ViewModel/CategoryVM.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/ViewModel/EventDetailVM.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/ViewModel/EventVM.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/ViewModel/MarketChartVM.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/ViewModel/UserVM.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/ViewModel/authVM.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.dart_tool/dartpad/web_plugin_registrant.dart" beforeDir="false" afterPath="$PROJECT_DIR$/.dart_tool/dartpad/web_plugin_registrant.dart" afterDir="false" />
+    <list default="true" id="ef881180-111e-4c11-9554-3295fb13d7a5" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/lib/Models/OrderBookModel.dart" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/lib/Models/OrderModel.dart" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/lib/PredictScreens/PredictionDetailScreens/BuyScreens/OrderBookService.dart" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/lib/Repository/OrderRepository.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.dart_tool/package_config.json" beforeDir="false" afterPath="$PROJECT_DIR$/.dart_tool/package_config.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.dart_tool/package_graph.json" beforeDir="false" afterPath="$PROJECT_DIR$/.dart_tool/package_graph.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.dart_tool/version" beforeDir="false" afterPath="$PROJECT_DIR$/.dart_tool/version" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.flutter-plugins-dependencies" beforeDir="false" afterPath="$PROJECT_DIR$/.flutter-plugins-dependencies" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/caches/deviceStreaming.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/caches/deviceStreaming.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Dart_SDK.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/libraries/Dart_SDK.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Flutter_Plugins.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/libraries/Flutter_Plugins.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/android/app/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/android/app/build.gradle.kts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/android/app/src/main/java/io/flutter/plugins/GeneratedPluginRegistrant.java" beforeDir="false" afterPath="$PROJECT_DIR$/android/app/src/main/java/io/flutter/plugins/GeneratedPluginRegistrant.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/android/gradle.properties" beforeDir="false" afterPath="$PROJECT_DIR$/android/gradle.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/android/local.properties" beforeDir="false" afterPath="$PROJECT_DIR$/android/local.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/images/marketbg.png" beforeDir="false" afterPath="$PROJECT_DIR$/assets/images/marketbg.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/images/marketbgo.png" beforeDir="false" afterPath="$PROJECT_DIR$/assets/images/marketbgo.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ios/Flutter/Generated.xcconfig" beforeDir="false" afterPath="$PROJECT_DIR$/ios/Flutter/Generated.xcconfig" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ios/Flutter/flutter_export_environment.sh" beforeDir="false" afterPath="$PROJECT_DIR$/ios/Flutter/flutter_export_environment.sh" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ios/Runner.xcodeproj/project.pbxproj" beforeDir="false" afterPath="$PROJECT_DIR$/ios/Runner.xcodeproj/project.pbxproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ios/Runner/GeneratedPluginRegistrant.m" beforeDir="false" afterPath="$PROJECT_DIR$/ios/Runner/GeneratedPluginRegistrant.m" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/APIService/Remote/network/ApiEndPoints.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/APIService/Remote/network/ApiEndPoints.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/APIService/Remote/network/BaseApiService.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/APIService/Remote/network/BaseApiService.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/APIService/Remote/network/NetworkApiService.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/APIService/Remote/network/NetworkApiService.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/PredictScreens/BottomNavScreen/BottomNavScreen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/PredictScreens/BottomNavScreen/BottomNavScreen.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/PredictScreens/HomeScreens/HomeView.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/PredictScreens/HomeScreens/HomeView.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/PredictScreens/LoginScreens/LoginView.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/PredictScreens/LoginScreens/LoginView.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/PredictScreens/ProfileScreens/profileView.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/PredictScreens/ProfileScreens/profileView.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/PredictScreens/ProtfolioScreens/portfolioView.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/PredictScreens/ProtfolioScreens/portfolioView.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/PredictScreens/RankingScreens/RankingView.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/PredictScreens/RankingScreens/RankingView.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/PredictScreens/ReferralScreens/RefferalView.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/PredictScreens/ReferralScreens/RefferalView.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/Predict_Utils/CustomSnackBar/StatusMessage.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Predict_Utils/CustomSnackBar/StatusMessage.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/Reusable_Widgets/AppText_Theme/AppText_Theme.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Reusable_Widgets/AppText_Theme/AppText_Theme.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/acc.dart" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/chat.dart" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/graf.dart" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/main.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/main.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/market.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/PredictScreens/MatchScreens/matchView.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/money.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/PredictScreens/DepositWithdrawScreen/DepositWithdrawScreen.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/wach.dart" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/wachlist.dart" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/linux/flutter/generated_plugin_registrant.cc" beforeDir="false" afterPath="$PROJECT_DIR$/linux/flutter/generated_plugin_registrant.cc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/linux/flutter/generated_plugins.cmake" beforeDir="false" afterPath="$PROJECT_DIR$/linux/flutter/generated_plugins.cmake" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/macos/Flutter/GeneratedPluginRegistrant.swift" beforeDir="false" afterPath="$PROJECT_DIR$/macos/Flutter/GeneratedPluginRegistrant.swift" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/macos/Flutter/ephemeral/Flutter-Generated.xcconfig" beforeDir="false" afterPath="$PROJECT_DIR$/macos/Flutter/ephemeral/Flutter-Generated.xcconfig" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/macos/Flutter/ephemeral/flutter_export_environment.sh" beforeDir="false" afterPath="$PROJECT_DIR$/macos/Flutter/ephemeral/flutter_export_environment.sh" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/predict365.iml" beforeDir="false" afterPath="$PROJECT_DIR$/predict365.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/PredictScreens/PredictionDetailScreens/BuyScreens/BuyDrawerView.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/PredictScreens/PredictionDetailScreens/BuyScreens/BuyDrawerView.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/PredictScreens/PredictionDetailScreens/predictionDetailView.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/PredictScreens/PredictionDetailScreens/predictionDetailView.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/Predict_Utils/ColorHandlers/AppColors.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Predict_Utils/ColorHandlers/AppColors.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/Repository/EventRespository.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Repository/EventRespository.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pubspec.lock" beforeDir="false" afterPath="$PROJECT_DIR$/pubspec.lock" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pubspec.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/pubspec.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/windows/flutter/generated_plugin_registrant.cc" beforeDir="false" afterPath="$PROJECT_DIR$/windows/flutter/generated_plugin_registrant.cc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/windows/flutter/generated_plugins.cmake" beforeDir="false" afterPath="$PROJECT_DIR$/windows/flutter/generated_plugins.cmake" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -202,14 +135,23 @@
       <option name="project" value="LOCAL" />
       <updated>1772707667165</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="event api call">
+      <option name="closed" value="true" />
+      <created>1773312332842</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1773312332842</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="initial commit" />
     <MESSAGE value="home,rank ui" />
     <MESSAGE value="home,rank,refer ui" />
-    <option name="LAST_COMMIT_MESSAGE" value="home,rank,refer ui" />
+    <MESSAGE value="event api call" />
+    <option name="LAST_COMMIT_MESSAGE" value="event api call" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

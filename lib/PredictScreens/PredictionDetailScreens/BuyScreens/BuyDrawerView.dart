@@ -1,52 +1,104 @@
-// lib/PredictScreens/BuyScreen/BuyScreen.dart
+// lib/PredictScreens/PredictionDetailScreens/BuyScreens/BuyBottomSheet.dart
 
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:predict365/Models/EventModel.dart';
+import 'package:predict365/Models/OrderBookModel.dart';
+import 'package:predict365/Models/OrderModel.dart';
 import 'package:predict365/Predict_Utils/App_Theme/App_Theme.dart';
-import 'package:predict365/Reusable_Widgets/AppText_Theme/AppText_Theme.dart';
-import 'package:predict365/Reusable_Widgets/BondingNavigator.dart';
-import 'package:predict365/Reusable_Widgets/ReuseableGradientContainer/ReusableGradientContainer.dart';
+import 'package:predict365/Predict_Utils/ColorHandlers/AppColors.dart';
+import 'package:predict365/Repository/OrderRepository.dart';
 import 'package:predict365/ViewModel/UserVM.dart';
 import 'package:provider/provider.dart';
 
-class BuyScreen extends StatefulWidget {
-  final SubMarket subMarket;
-  final bool      initialIsYes;
-  final EventModel event;
+// ── Gold gradient ──────────────────────────────────────────────
+const _goldGrad = LinearGradient(
+  begin: Alignment.topLeft,
+  end: Alignment.bottomRight,
+  colors: [Color(0xFF985720), Color(0xFFB6792E), Color(0xFFD3983B)],
+);
 
-  const BuyScreen({
-    super.key,
+const Map<String, String> _tifApiValues = {
+  'Good Till Cancel': 'GTC',
+  'Day': 'DAY',
+  'One Hour': 'IOC',
+  'One Week': 'GTW',
+};
+
+String _makeClientOrderId() {
+  final ts  = DateTime.now().millisecondsSinceEpoch;
+  final hex = Random().nextInt(0xFFFFFF).toRadixString(16).padLeft(6, '0');
+  return 'cid-$ts-$hex';
+}
+
+// ── Entry point — call this from Yes/No button taps ────────────
+void showBuySheet(
+    BuildContext context, {
+      required SubMarket subMarket,
+      required EventModel event,
+      required bool initialIsYes,
+      double? initialPrice,       // cents, from order book row tap
+    }) {
+  showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: Colors.transparent,
+    builder: (_) => _BuySheet(
+      subMarket:    subMarket,
+      event:        event,
+      initialIsYes: initialIsYes,
+      initialPrice: initialPrice,
+    ),
+  );
+}
+
+// ══════════════════════════════════════════════════════════════
+// SHEET WIDGET
+// ══════════════════════════════════════════════════════════════
+class _BuySheet extends StatefulWidget {
+  final SubMarket  subMarket;
+  final EventModel event;
+  final bool       initialIsYes;
+  final double?    initialPrice;
+
+  const _BuySheet({
     required this.subMarket,
-    required this.initialIsYes,
     required this.event,
+    required this.initialIsYes,
+    required this.initialPrice,
   });
 
   @override
-  State<BuyScreen> createState() => _BuyScreenState();
+  State<_BuySheet> createState() => _BuySheetState();
 }
 
-class _BuyScreenState extends State<BuyScreen> {
+class _BuySheetState extends State<_BuySheet> {
+  // ── state ──────────────────────────────────────────────────
   late bool   isYes;
-  bool        isBuy        = true;
-  bool        isMarket     = true;
-  int         quantity     = 0;
-  double      limitPrice   = 0;
-  String      expiration   = 'Good Till Cancel';
+  bool        isBuy      = true;
+  bool        isMarket   = true;
+  int         quantity   = 0;
+  double      limitPrice = 0;
+  bool        _expirationEnabled = false;
+  String      expiration = 'Good Till Cancel';
+  bool        _placing   = false;
 
-  final TextEditingController _qtyCtrl   = TextEditingController(text: '0');
-  final TextEditingController _priceCtrl = TextEditingController(text: '0');
+  final _qtyCtrl   = TextEditingController(text: '0');
+  final _priceCtrl = TextEditingController(text: '0');
 
   static const List<String> _expirationOptions = [
-    'Good Till Cancel',
-    'Day',
-    'One Hour',
-    'One Week',
+    'Good Till Cancel', 'Day', 'One Hour', 'One Week',
   ];
 
   @override
   void initState() {
     super.initState();
     isYes = widget.initialIsYes;
+    if (widget.initialPrice != null && widget.initialPrice! > 0) {
+      isMarket        = false;
+      limitPrice      = widget.initialPrice!;
+      _priceCtrl.text = widget.initialPrice!.toStringAsFixed(0);
+    }
   }
 
   @override
@@ -56,423 +108,647 @@ class _BuyScreenState extends State<BuyScreen> {
     super.dispose();
   }
 
+  // ── computed values ────────────────────────────────────────
+  double get _total    => isMarket ? 0 : (limitPrice / 100) * quantity;
+  double get _toWin    => isMarket ? 0 : quantity * (1 - limitPrice / 100);
+
   void _adjustQty(int delta) {
-    final newVal = (quantity + delta).clamp(0, 999999);
+    final v = (quantity + delta).clamp(0, 999999);
     setState(() {
-      quantity = newVal;
-      _qtyCtrl.text = newVal.toString();
-      _qtyCtrl.selection = TextSelection.fromPosition(
-          TextPosition(offset: _qtyCtrl.text.length));
+      quantity      = v;
+      _qtyCtrl.text = v.toString();
+      _qtyCtrl.selection =
+          TextSelection.fromPosition(TextPosition(offset: _qtyCtrl.text.length));
     });
+  }
+
+  void _adjustPrice(int delta) {
+    final v = (limitPrice + delta).clamp(1.0, 99.0);
+    setState(() {
+      limitPrice      = v;
+      _priceCtrl.text = v.toStringAsFixed(0);
+    });
+  }
+
+  Future<void> _placeOrder() async {
+    if (quantity <= 0) {
+      _showSnack('Please enter a valid number of shares.', isError: true);
+      return;
+    }
+    if (!isMarket && (limitPrice <= 0 || limitPrice > 99)) {
+      _showSnack('Price must be between 1¢ and 99¢.', isError: true);
+      return;
+    }
+    setState(() => _placing = true);
+
+    final request = OrderRequest(
+      clientOrderId: _makeClientOrderId(),
+      marketId:      widget.subMarket.id,
+      side:          isBuy  ? 'BUY'  : 'SELL',
+      outcome:       isYes  ? 'YES'  : 'NO',
+      orderType:     isMarket ? 'MARKET' : 'LIMIT',
+      price:         isMarket ? 0.5 : (limitPrice / 100).clamp(0.01, 0.99),
+      shares:        quantity.toString(),
+      timeInForce:   _tifApiValues[expiration] ?? 'GTC',
+    );
+
+    try {
+      final response = await OrderRepository().placeOrder(request);
+      if (!mounted) return;
+      if (response.success) {
+        FocusScope.of(context).unfocus();
+        Navigator.pop(context);
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text(
+            'Order placed! Status: ${response.order?.status ?? 'ACKED'}',
+            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+          ),
+          backgroundColor: Colors.green.shade700,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          duration: const Duration(seconds: 2),
+        ));
+      } else {
+        _showSnack(
+          response.message.isNotEmpty ? response.message : 'Failed to place order.',
+          isError: true,
+        );
+      }
+    } catch (e) {
+      if (!mounted) return;
+      _showSnack(_friendlyError(e.toString()), isError: true);
+    } finally {
+      if (mounted) setState(() => _placing = false);
+    }
+  }
+
+  void _showSnack(String msg, {required bool isError}) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text(msg,
+          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
+      backgroundColor: isError ? Colors.red.shade700 : Colors.green.shade700,
+      behavior: SnackBarBehavior.floating,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      duration: Duration(seconds: isError ? 3 : 2),
+    ));
+  }
+
+  String _friendlyError(String e) {
+    if (e.contains('401')) return 'Session expired. Please login again.';
+    if (e.contains('403')) return 'Access denied.';
+    if (e.contains('400')) return 'Invalid order details.';
+    if (e.contains('500')) return 'Server error. Please try again.';
+    return 'Something went wrong. Please try again.';
   }
 
   @override
   Widget build(BuildContext context) {
-    final isDark  = context.watch<ThemeController>().isDarkMode;
-    final bg      = Theme.of(context).scaffoldBackgroundColor;
-    final card    = Theme.of(context).primaryColorDark;
-    final txt     = isDark ? Colors.white : Colors.black87;
-    final divC    = Theme.of(context).dividerColor;
-    final user    = context.watch<UserViewModel>().user;
-    final isOpen  = widget.subMarket.isOpen;
+    final isDark = context.watch<ThemeController>().isDarkMode;
+    final card   = Theme.of(context).primaryColorDark;
+    final bg     = Theme.of(context).scaffoldBackgroundColor;
+    final txt    = isDark ? Colors.white : Colors.black87;
+    final divC   = Theme.of(context).dividerColor;
+    final user   = context.watch<UserViewModel>().user;
+    final bottom = MediaQuery.of(context).viewInsets.bottom;
 
-    return Scaffold(
-      backgroundColor: bg,
-      body: SafeArea(
-        child: Column(
-          children: [
+    return Container(
+      decoration: BoxDecoration(
+        color: bg,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      padding: EdgeInsets.fromLTRB(0, 0, 0, bottom),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
 
-            // ── TOP BAR ──────────────────────────────────────────
+          // ── drag handle ───────────────────────────────────────
+          Container(
+            width: 40, height: 4,
+            margin: const EdgeInsets.only(top: 12, bottom: 4),
+            decoration: BoxDecoration(
+              color: Colors.grey.shade600,
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+
+          // ── TOP BAR: Buy↓  |  Market⇄ / Limit⇄ ──────────────
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            child: Row(children: [
+              // Buy / Sell dropdown
+              GestureDetector(
+                onTap: () => setState(() => isBuy = !isBuy),
+                child: Row(children: [
+                  Text(isBuy ? 'Buy' : 'Sell',
+                      style: TextStyle(
+                          fontSize: 22, fontWeight: FontWeight.w800, color: txt)),
+                  const SizedBox(width: 4),
+                  Icon(Icons.keyboard_arrow_down, size: 22, color: txt),
+                ]),
+              ),
+              const Spacer(),
+              // Market / Limit toggle
+              GestureDetector(
+                onTap: () => setState(() => isMarket = !isMarket),
+                child: Row(children: [
+                  Text(isMarket ? 'Market' : 'Limit',
+                      style: TextStyle(
+                          fontSize: 16, fontWeight: FontWeight.w600,
+                          color: Colors.grey.shade400)),
+                  const SizedBox(width: 4),
+                  Icon(Icons.swap_horiz, size: 18, color: Colors.grey.shade400),
+                ]),
+              ),
+            ]),
+          ),
+
+          Divider(color: divC, height: 1, thickness: 1),
+
+          // ── Event info row ────────────────────────────────────
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+            child: Row(children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(6),
+                child: widget.event.eventImage.isNotEmpty
+                    ? Image.network(widget.event.eventImage,
+                    width: 38, height: 38, fit: BoxFit.cover,
+                    errorBuilder: (_, __, ___) => _imgFallback(card))
+                    : _imgFallback(card),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(widget.event.eventTitle,
+                        style: TextStyle(
+                            fontSize: 13, fontWeight: FontWeight.w600, color: txt),
+                        maxLines: 1, overflow: TextOverflow.ellipsis),
+                    const SizedBox(height: 2),
+                    Row(children: [
+                      Text(widget.subMarket.name,
+                          style: TextStyle(
+                              fontSize: 12, color: Colors.grey.shade500),
+                          maxLines: 1, overflow: TextOverflow.ellipsis),
+                      const SizedBox(width: 8),
+                      // Yes / No pill
+                      GestureDetector(
+                        onTap: () => setState(() => isYes = !isYes),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 10, vertical: 3),
+                          decoration: BoxDecoration(
+                            color: isYes
+                                ? AppColors().greenButton.withValues(alpha: 0.15)
+                                : AppColors().redButton.withValues(alpha: 0.15),
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(
+                              color: isYes
+                                  ? AppColors().greenButton.withValues(alpha: 0.5)
+                                  : AppColors().redButton.withValues(alpha: 0.5),
+                            ),
+                          ),
+                          child: Row(mainAxisSize: MainAxisSize.min, children: [
+                            Text(isYes ? widget.subMarket.side1 : widget.subMarket.side2,
+                                style: TextStyle(
+                                    fontSize: 12, fontWeight: FontWeight.w700,
+                                    color: isYes
+                                        ? AppColors().greenButton
+                                        : AppColors().redButton)),
+                            const SizedBox(width: 4),
+                            Icon(Icons.swap_horiz, size: 14,
+                                color: isYes
+                                    ? AppColors().greenButton
+                                    : AppColors().redButton),
+                          ]),
+                        ),
+                      ),
+                    ]),
+                  ],
+                ),
+              ),
+            ]),
+          ),
+
+          const SizedBox(height: 20),
+
+          // ══════════════════════════════════════════════════════
+          // MARKET MODE
+          // ══════════════════════════════════════════════════════
+          if (isMarket) ...[
+            // Big amount display
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+              padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
+                  // minus button
                   GestureDetector(
-                    onTap: () => predictNavigator.backPage(context),
+                    onTap: () => _adjustQty(-1),
                     child: Container(
-                      width: 38, height: 38,
+                      width: 44, height: 44,
                       decoration: BoxDecoration(
                         color: card,
-                        borderRadius: BorderRadius.circular(10),
+                        borderRadius: BorderRadius.circular(22),
                         border: Border.all(color: divC),
                       ),
-                      child: Icon(Icons.arrow_back_ios_new,
-                          size: 16,
-                          color: Theme.of(context).iconTheme.color),
+                      child: Icon(Icons.remove, color: txt, size: 20),
                     ),
                   ),
-                  const SizedBox(width: 12),
+
+                  // amount field
                   Expanded(
-                    child: Text(
-                      widget.subMarket.name,
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w700,
-                        color: txt,
+                    child: Center(
+                      child: IntrinsicWidth(
+                        child: TextField(
+                          controller: _qtyCtrl,
+                          keyboardType: TextInputType.number,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                              fontSize: 48,
+                              fontWeight: FontWeight.w800,
+                              color: Colors.grey.shade500),
+                          decoration: const InputDecoration(
+                            border: InputBorder.none,
+                            isDense: true,
+                            prefixText: '₹',
+                            prefixStyle: TextStyle(
+                                fontSize: 48,
+                                fontWeight: FontWeight.w800,
+                                color: Color(0xFF888888)),
+                          ),
+                          onChanged: (v) =>
+                              setState(() => quantity = int.tryParse(v) ?? 0),
+                        ),
                       ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
-                  const SizedBox(width: 10),
-                  // OPEN / CLOSED badge
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 14, vertical: 5),
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                        color: isOpen ? Colors.green : Colors.red,
-                        width: 1.5,
+
+                  // plus button
+                  GestureDetector(
+                    onTap: () => _adjustQty(1),
+                    child: Container(
+                      width: 44, height: 44,
+                      decoration: BoxDecoration(
+                        color: card,
+                        borderRadius: BorderRadius.circular(22),
+                        border: Border.all(color: divC),
                       ),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Text(
-                      isOpen ? 'OPEN' : 'CLOSED',
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w700,
-                        color: isOpen ? Colors.green : Colors.red,
-                      ),
+                      child: Icon(Icons.add, color: txt, size: 20),
                     ),
                   ),
                 ],
               ),
             ),
+            const SizedBox(height: 20),
 
-            Divider(color: divC, thickness: 1, height: 1),
-
-            // ── SCROLLABLE BODY ───────────────────────────────────
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(16, 20, 16, 24),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-
-                    // ── BUY / SELL  +  MARKET / LIMIT ──
-                    Row(
-                      children: [
-                        _modePill(
-                          leftLabel: 'Buy',
-                          rightLabel: 'Sell',
-                          isLeft: isBuy,
-                          onLeft:  () => setState(() => isBuy = true),
-                          onRight: () => setState(() => isBuy = false),
-                          txt: txt, card: card,
-                        ),
-                        const SizedBox(width: 10),
-                        _modePill(
-                          leftLabel: 'Market',
-                          rightLabel: 'Limit',
-                          isLeft: isMarket,
-                          onLeft:  () => setState(() => isMarket = true),
-                          onRight: () => setState(() => isMarket = false),
-                          txt: txt, card: card,
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 20),
-
-                    // ── YES / NO BUTTONS ──
-                    Row(
-                      children: [
-                        Expanded(
-                          child: GestureDetector(
-                            onTap: () => setState(() => isYes = true),
-                            child: AnimatedContainer(
-                              duration: const Duration(milliseconds: 180),
-                              height: 52,
-                              decoration: BoxDecoration(
-                                color: isYes
-                                    ? Colors.green
-                                    : Colors.transparent,
-                                border: Border.all(
-                                  color: isYes
-                                      ? Colors.green
-                                      : Colors.grey.shade600,
-                                  width: 1.5,
-                                ),
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              alignment: Alignment.center,
-                              child: Text(
-                                '${widget.subMarket.side1} -',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w700,
-                                  color: isYes
-                                      ? Colors.white
-                                      : Colors.grey.shade400,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: GestureDetector(
-                            onTap: () => setState(() => isYes = false),
-                            child: AnimatedContainer(
-                              duration: const Duration(milliseconds: 180),
-                              height: 52,
-                              decoration: BoxDecoration(
-                                color: Colors.transparent,
-                                border: Border.all(
-                                  color: !isYes
-                                      ? Colors.red
-                                      : Colors.grey.shade600,
-                                  width: 1.5,
-                                ),
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              alignment: Alignment.center,
-                              child: Text(
-                                '${widget.subMarket.side2} -',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w700,
-                                  color: !isYes
-                                      ? Colors.red
-                                      : Colors.grey.shade400,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 24),
-
-                    // ── SHARES ROW ──
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        GestureDetector(
-                          onTap: () {},
-                          child: Row(children: [
-                            Text('Shares',
-                                style: TextStyle(
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w500,
-                                    color: Colors.grey.shade500)),
-                            const SizedBox(width: 4),
-                            Icon(Icons.keyboard_arrow_down,
-                                size: 18, color: Colors.grey.shade500),
-                          ]),
-                        ),
-                        const SizedBox(width: 14),
-                        Expanded(
-                          child: Container(
-                            height: 48,
-                            decoration: BoxDecoration(
-                              color: card,
-                              borderRadius: BorderRadius.circular(10),
-                              border: Border.all(color: divC),
-                            ),
-                            padding: const EdgeInsets.symmetric(horizontal: 14),
-                            child: TextField(
-                              controller: _qtyCtrl,
-                              keyboardType: TextInputType.number,
-                              style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w600,
-                                  color: txt),
-                              decoration: const InputDecoration(
-                                border: InputBorder.none,
-                                isDense: true,
-                                contentPadding: EdgeInsets.zero,
-                              ),
-                              onChanged: (v) => setState(
-                                      () => quantity = int.tryParse(v) ?? 0),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 10),
-
-                    // ── QUICK ADJUST CHIPS ──
-                    Row(
-                      children: [-20, -5, 5, 20].map((delta) {
-                        return Expanded(
-                          child: GestureDetector(
-                            onTap: () => _adjustQty(delta),
-                            child: Container(
-                              margin: const EdgeInsets.only(right: 6),
-                              padding:
-                              const EdgeInsets.symmetric(vertical: 10),
-                              decoration: BoxDecoration(
-                                color: card,
-                                borderRadius: BorderRadius.circular(8),
-                                border: Border.all(color: divC),
-                              ),
-                              alignment: Alignment.center,
-                              child: Text(
-                                delta > 0 ? '+$delta' : '$delta',
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w600,
-                                  color: txt,
-                                ),
-                              ),
-                            ),
-                          ),
-                        );
-                      }).toList(),
-                    ),
-
-                    // ── LIMIT-ONLY FIELDS ──
-                    if (!isMarket) ...[
-                      const SizedBox(height: 20),
-
-                      // Price row
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Text('Price',
-                              style: TextStyle(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w500,
-                                  color: Colors.grey.shade500)),
-                          const SizedBox(width: 14),
-                          Expanded(
-                            child: Container(
-                              height: 48,
-                              decoration: BoxDecoration(
-                                color: card,
-                                borderRadius: BorderRadius.circular(10),
-                                border: Border.all(color: divC),
-                              ),
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 14),
-                              child: Row(children: [
-                                Text('¢ ',
-                                    style: TextStyle(
-                                        fontSize: 16,
-                                        color: Colors.grey.shade500,
-                                        fontWeight: FontWeight.w500)),
-                                Expanded(
-                                  child: TextField(
-                                    controller: _priceCtrl,
-                                    keyboardType:
-                                    const TextInputType.numberWithOptions(
-                                        decimal: true),
-                                    style: TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.w600,
-                                        color: txt),
-                                    decoration: const InputDecoration(
-                                      border: InputBorder.none,
-                                      isDense: true,
-                                      contentPadding: EdgeInsets.zero,
-                                    ),
-                                    onChanged: (v) => setState(() =>
-                                    limitPrice = double.tryParse(v) ?? 0),
-                                  ),
-                                ),
-                              ]),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
-
-                      // Expiration row
-                      Row(
-                        children: [
-                          Text('Expiration',
-                              style: TextStyle(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w500,
-                                  color: Colors.grey.shade500)),
-                          const Spacer(),
-                          GestureDetector(
-                            onTap: () =>
-                                _showExpirationPicker(context, txt, card, divC),
-                            child: Row(children: [
-                              Text(expiration,
-                                  style: TextStyle(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.w700,
-                                      color: txt)),
-                              const SizedBox(width: 4),
-                              Icon(Icons.keyboard_arrow_down,
-                                  size: 18, color: Colors.grey.shade500),
-                            ]),
-                          ),
-                        ],
-                      ),
-                    ],
-
-                    const SizedBox(height: 24),
-
-                    // ── AVAILABLE BALANCE ──
-                    Center(
-                      child: Text(
-                        'Available Balance: ${user?.balanceFormatted ?? '₹0.00'}',
-                        style: TextStyle(
-                            fontSize: 13, color: Colors.grey.shade500),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-
-            // ── PLACE ORDER BUTTON (pinned bottom) ───────────────
+            // Quick chips: +1 +5 +10 +100 Max
             Padding(
-              padding: EdgeInsets.fromLTRB(
-                  16, 8, 16, MediaQuery.of(context).padding.bottom + 16),
-              child: SizedBox(
-                width: double.infinity,
-                height: 54,
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [Color(0xFF977032), Color(0xFFF5A623)],
-                      begin: Alignment.centerLeft,
-                      end: Alignment.centerRight,
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Row(
+                children: [1, 5, 10, 100].map((v) {
+                  return Expanded(
+                    child: GestureDetector(
+                      onTap: () => _adjustQty(v),
+                      child: Container(
+                        margin: const EdgeInsets.only(right: 8),
+                        padding: const EdgeInsets.symmetric(vertical: 11),
+                        decoration: BoxDecoration(
+                          color: card,
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(color: divC),
+                        ),
+                        alignment: Alignment.center,
+                        child: Text('+₹$v',
+                            style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                                color: txt)),
+                      ),
                     ),
-                    borderRadius: BorderRadius.circular(30),
-                  ),
-                  child: ElevatedButton(
-                    onPressed: () {},
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.transparent,
-                      shadowColor: Colors.transparent,
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30)),
-                      elevation: 0,
-                    ),
-                    child: const Text(
-                      'Place Order',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 17,
-                        fontWeight: FontWeight.w700,
+                  );
+                }).followedBy([
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () {
+                        final bal = context.read<UserViewModel>().user?.wallet ?? 0;
+                        setState(() {
+                          quantity      = bal.toInt();
+                          _qtyCtrl.text = quantity.toString();
+                        });
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(vertical: 11),
+                        decoration: BoxDecoration(
+                          color: card,
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(color: divC),
+                        ),
+                        alignment: Alignment.center,
+                        child: Text('Max',
+                            style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                                color: txt)),
                       ),
                     ),
                   ),
-                ),
+                ]).toList(),
               ),
             ),
           ],
-        ),
+
+          // ══════════════════════════════════════════════════════
+          // LIMIT MODE
+          // ══════════════════════════════════════════════════════
+          if (!isMarket) ...[
+            // Limit Price row
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Row(children: [
+                Text('Limit Price',
+                    style: TextStyle(
+                        fontSize: 16, fontWeight: FontWeight.w600, color: txt)),
+                const Spacer(),
+                Container(
+                  decoration: BoxDecoration(
+                    color: card,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: divC),
+                  ),
+                  child: Row(mainAxisSize: MainAxisSize.min, children: [
+                    // minus
+                    GestureDetector(
+                      onTap: () => _adjustPrice(-1),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 14, vertical: 12),
+                        child: Icon(Icons.remove, size: 18, color: txt),
+                      ),
+                    ),
+                    // price display
+                    SizedBox(
+                      width: 60,
+                      child: TextField(
+                        controller: _priceCtrl,
+                        keyboardType:  TextInputType.numberWithOptions(
+                            decimal: true),
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                            color: txt),
+                        decoration:  InputDecoration(
+                          border: InputBorder.none,
+                          isDense: true,
+                          contentPadding: EdgeInsets.zero,
+                          suffixText: '¢',
+                          suffixStyle: TextStyle(color: Theme.of(context).iconTheme.color)
+                        ),
+                        onChanged: (v) =>
+                            setState(() => limitPrice = double.tryParse(v) ?? 0),
+                      ),
+                    ),
+                    // plus
+                    GestureDetector(
+                      onTap: () => _adjustPrice(1),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 14, vertical: 12),
+                        child: Icon(Icons.add, size: 18, color: txt),
+                      ),
+                    ),
+                  ]),
+                ),
+              ]),
+            ),
+            const SizedBox(height: 16),
+
+            // Shares row
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Row(children: [
+                Text('Shares',
+                    style: TextStyle(
+                        fontSize: 16, fontWeight: FontWeight.w600, color: txt)),
+                const Spacer(),
+                Container(
+                  width: 160,
+                  height: 48,
+                  decoration: BoxDecoration(
+                    color: card,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: divC),
+                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 14),
+                  child: TextField(
+                    controller: _qtyCtrl,
+                    keyboardType: TextInputType.number,
+                    textAlign: TextAlign.right,
+                    style: TextStyle(
+                        fontSize: 16, fontWeight: FontWeight.w600, color: txt),
+                    decoration: const InputDecoration(
+                      border: InputBorder.none,
+                      isDense: true,
+                      contentPadding: const EdgeInsets.symmetric(
+
+                        vertical: 14,
+                      ),
+                    ),
+                    onChanged: (v) =>
+                        setState(() => quantity = int.tryParse(v) ?? 0),
+                  ),
+                ),
+              ]),
+            ),
+            const SizedBox(height: 12),
+
+            // Quick chips: -100 -10 +10 +100 +20
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [-100, -10, 10, 100, 20].map((d) {
+                  return GestureDetector(
+                    onTap: () => _adjustQty(d),
+                    child: Container(
+                      margin: const EdgeInsets.only(left: 6),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 9),
+                      decoration: BoxDecoration(
+                        color: card,
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(color: divC),
+                      ),
+                      child: Text(d > 0 ? '+$d' : '$d',
+                          style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: txt)),
+                    ),
+                  );
+                }).toList(),
+              ),
+            ),
+            const SizedBox(height: 16),
+
+            // Set expiration toggle
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Row(children: [
+                Text('Set expiration',
+                    style: TextStyle(
+                        fontSize: 15, fontWeight: FontWeight.w500, color: txt)),
+                const Spacer(),
+                Switch(
+                  value: _expirationEnabled,
+                  onChanged: (v) => setState(() => _expirationEnabled = v),
+                  activeColor: const Color(0xFFD3983B),
+                ),
+              ]),
+            ),
+
+            // Expiration picker (visible only when toggle is on)
+            if (_expirationEnabled)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+                child: GestureDetector(
+                  onTap: () => _showExpirationPicker(context, txt, card, divC),
+                  child: Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 14, vertical: 12),
+                    decoration: BoxDecoration(
+                      color: card,
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: divC),
+                    ),
+                    child: Row(children: [
+                      Text(expiration,
+                          style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              color: txt)),
+                      const Spacer(),
+                      Icon(Icons.keyboard_arrow_down,
+                          size: 18, color: Colors.grey.shade500),
+                    ]),
+                  ),
+                ),
+              ),
+
+            Divider(color: divC, height: 1),
+            const SizedBox(height: 12),
+
+            // Total
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Row(children: [
+                Text('Total',
+                    style: TextStyle(
+                        fontSize: 15, fontWeight: FontWeight.w500, color: txt)),
+                const Spacer(),
+                Text('₹${_total.toStringAsFixed(2)}',
+                    style: TextStyle(
+                        fontSize: 15, fontWeight: FontWeight.w700,
+                        color: AppColors().greenButton)),
+              ]),
+            ),
+            const SizedBox(height: 10),
+
+            // To win
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Row(children: [
+                Row(children: [
+                  Text('To win',
+                      style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w500,
+                          color: txt)),
+                  const SizedBox(width: 4),
+                  Icon(Icons.info_outline,
+                      size: 15, color: Colors.grey.shade500),
+                ]),
+                const Spacer(),
+                Text('₹${_toWin.toStringAsFixed(2)}',
+                    style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors().greenButton)),
+              ]),
+            ),
+          ],
+
+          const SizedBox(height: 20),
+
+          // ── Available balance ─────────────────────────────────
+          Text(
+            'Available: ${user?.balanceFormatted ?? '₹0.00'}',
+            style: TextStyle(fontSize: 12, color: Colors.grey.shade500),
+          ),
+          const SizedBox(height: 14),
+
+          // ── Trade button ──────────────────────────────────────
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 20),
+            child: SizedBox(
+              width: double.infinity,
+              height: 52,
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: _goldGrad,
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: ElevatedButton(
+                  onPressed: _placing ? null : _placeOrder,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.transparent,
+                    shadowColor: Colors.transparent,
+                    disabledBackgroundColor: Colors.transparent,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14)),
+                    elevation: 0,
+                  ),
+                  child: _placing
+                      ? const SizedBox(
+                    width: 22, height: 22,
+                    child: CircularProgressIndicator(
+                        color: Colors.white, strokeWidth: 2.5),
+                  )
+                      : const Text('Trade',
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 17,
+                          fontWeight: FontWeight.w700)),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
 
-  // ── Expiration picker ─────────────────────────────────────────
+  Widget _imgFallback(Color card) => Container(
+    width: 38, height: 38,
+    decoration: BoxDecoration(
+      color: card,
+      borderRadius: BorderRadius.circular(6),
+    ),
+    child: Icon(Icons.event, color: Colors.grey.shade400, size: 18),
+  );
+
   void _showExpirationPicker(
-      BuildContext context, Color txt, Color card, Color divC) {
+      BuildContext ctx, Color txt, Color card, Color divC) {
     showModalBottomSheet(
-      context: context,
+      context: ctx,
       backgroundColor: Colors.transparent,
       builder: (_) => Container(
         decoration: BoxDecoration(
           color: card,
-          borderRadius:
-          const BorderRadius.vertical(top: Radius.circular(20)),
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
         ),
         padding: const EdgeInsets.fromLTRB(16, 12, 16, 32),
         child: Column(
@@ -482,120 +758,46 @@ class _BuyScreenState extends State<BuyScreen> {
               width: 38, height: 4,
               margin: const EdgeInsets.only(bottom: 16),
               decoration: BoxDecoration(
-                color: Colors.grey.shade500,
-                borderRadius: BorderRadius.circular(2),
-              ),
+                  color: Colors.grey.shade500,
+                  borderRadius: BorderRadius.circular(2)),
             ),
             Text('Select Expiration',
                 style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
-                    color: txt)),
+                    fontSize: 16, fontWeight: FontWeight.w700, color: txt)),
             const SizedBox(height: 12),
-            ..._expirationOptions.map((opt) => GestureDetector(
-              onTap: () {
-                setState(() => expiration = opt);
-                Navigator.pop(context);
-              },
-              child: Container(
-                width: double.infinity,
-                padding: const EdgeInsets.symmetric(
-                    vertical: 14, horizontal: 16),
-                margin: const EdgeInsets.only(bottom: 2),
-                decoration: BoxDecoration(
-                  color: expiration == opt
-                      ? const Color(0xFFF5A623).withValues(alpha: 0.12)
-                      : Colors.transparent,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Row(children: [
-                  Text(opt,
-                      style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: expiration == opt
-                              ? FontWeight.w700
-                              : FontWeight.w400,
-                          color: expiration == opt
-                              ? const Color(0xFFF5A623)
-                              : txt)),
-                  const Spacer(),
-                  if (expiration == opt)
-                    const Icon(Icons.check,
-                        size: 18, color: Color(0xFFF5A623)),
-                ]),
-              ),
-            )),
-          ],
-        ),
-      ),
-    );
-  }
-
-  // ── Mode pill ─────────────────────────────────────────────────
-  Widget _modePill({
-    required String leftLabel,
-    required String rightLabel,
-    required bool isLeft,
-    required VoidCallback onLeft,
-    required VoidCallback onRight,
-    required Color txt,
-    required Color card,
-  }) {
-    return Expanded(
-      child: Container(
-        height: 40,
-        decoration: BoxDecoration(
-          color: card,
-          borderRadius: BorderRadius.circular(20),
-        ),
-        child: Row(
-          children: [
-            Expanded(
-              child: GestureDetector(
-                onTap: onLeft,
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 180),
-                  height: 40,
+            ..._expirationOptions.map((opt) {
+              final sel = expiration == opt;
+              return GestureDetector(
+                onTap: () {
+                  setState(() => expiration = opt);
+                  Navigator.pop(ctx);
+                },
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(
+                      vertical: 14, horizontal: 16),
+                  margin: const EdgeInsets.only(bottom: 2),
                   decoration: BoxDecoration(
-                    color: isLeft
-                        ? const Color(0xFFF5A623)
+                    color: sel
+                        ? const Color(0xFFF5A623).withValues(alpha: 0.12)
                         : Colors.transparent,
-                    borderRadius: BorderRadius.circular(20),
+                    borderRadius: BorderRadius.circular(10),
                   ),
-                  alignment: Alignment.center,
-                  child: Text(leftLabel,
-                      style: TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w700,
-                          color: isLeft
-                              ? Colors.white
-                              : Colors.grey.shade500)),
+                  child: Row(children: [
+                    Text(opt,
+                        style: TextStyle(
+                            fontSize: 15,
+                            fontWeight:
+                            sel ? FontWeight.w700 : FontWeight.w400,
+                            color: sel ? const Color(0xFFF5A623) : txt)),
+                    const Spacer(),
+                    if (sel)
+                      const Icon(Icons.check,
+                          size: 18, color: Color(0xFFF5A623)),
+                  ]),
                 ),
-              ),
-            ),
-            Expanded(
-              child: GestureDetector(
-                onTap: onRight,
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 180),
-                  height: 40,
-                  decoration: BoxDecoration(
-                    color: !isLeft
-                        ? const Color(0xFFF5A623)
-                        : Colors.transparent,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  alignment: Alignment.center,
-                  child: Text(rightLabel,
-                      style: TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w700,
-                          color: !isLeft
-                              ? Colors.white
-                              : Colors.grey.shade500)),
-                ),
-              ),
-            ),
+              );
+            }),
           ],
         ),
       ),

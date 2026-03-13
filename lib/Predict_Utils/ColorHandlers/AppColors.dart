@@ -30,6 +30,8 @@ class AppColors {
 
 
 final Color greyContainerLight = Colors.white;
+final Color greenButton = Color(0XFF01b571);
+final Color redButton = Color(0XFFff5a59);
  final Color iconColorLight = Color(0XFF4a5565);
   final Color appPrimaryColorLight = Colors.white.withOpacity(0.85);
   final Color container = Color(0XFF153491);

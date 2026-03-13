@@ -53,20 +53,25 @@ class _HomeScreenState extends State<HomeScreen> {
 
             // ── TOP BAR ──
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
               child: Consumer<UserViewModel>(
                 builder: (context, userVm, _) {
-                  final user = userVm.user;
+                  final user    = userVm.user;
                   final balance = user?.balanceFormatted ?? '₹0.00';
+
                   return Row(
                     children: [
+                      // Logo
                       Image.asset(
                         isDark
                             ? "assets/images/predictlogowhite.png"
                             : "assets/images/predictlogo.png",
                         height: 22,
                       ),
+
                       const Spacer(),
+
+                      // Balance button — intrinsic width, never truncates
                       GestureDetector(
                         onTap: () => predictNavigator.newPage(context, page: DepositScreen()),
                         child: Container(
@@ -75,31 +80,33 @@ class _HomeScreenState extends State<HomeScreen> {
                             borderRadius: BorderRadius.circular(8),
                             border: Border.all(color: Theme.of(context).dividerColor),
                           ),
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 5),
                           child: Row(
+                            mainAxisSize: MainAxisSize.min,
                             children: [
                               AppText(balance, fontSize: 13, fontWeight: FontWeight.w600),
-                              const SizedBox(width: 8),
+                              const SizedBox(width: 6),
                               GradientContainer(
                                 child: const Padding(
                                   padding: EdgeInsets.all(4),
-                                  child: Icon(Icons.add, size: 16, color: Colors.white),
+                                  child: Icon(Icons.add, size: 14, color: Colors.white),
                                 ),
                               ),
                             ],
                           ),
                         ),
                       ),
-                      const SizedBox(width: 10),
+
+                      const SizedBox(width: 8),
                       ThemeToggleIcon(),
-                      const SizedBox(width: 10),
+                      const SizedBox(width: 8),
                       Icon(Icons.notifications_none,
-                          color: Theme.of(context).iconTheme.color, size: 22),
-                      const SizedBox(width: 10),
-                      // Profile avatar — network image if available, else asset fallback
+                          color: Theme.of(context).iconTheme.color, size: 20),
+                      const SizedBox(width: 8),
                       CircleAvatar(
-                        radius: 16,
-                        backgroundImage: (user?.profileImage != null && user!.profileImage!.isNotEmpty)
+                        radius: 14,
+                        backgroundImage: (user?.profileImage != null &&
+                            user!.profileImage!.isNotEmpty)
                             ? NetworkImage(user.profileImage!) as ImageProvider
                             : const AssetImage("assets/images/myprofile.png"),
                       ),
@@ -111,7 +118,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
             // ── CATEGORY TABS ──
             SizedBox(
-              height: 32,
+              height: 26,
               child: Consumer<CategoryViewModel>(
                 builder: (context, catVm, _) {
                   final cats = catVm.categoryNames; // ['Trending', ...API names]
@@ -153,7 +160,6 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
 
-            const SizedBox(height: 2),
             Divider(color: Theme.of(context).dividerColor, thickness: 1),
             const SizedBox(height: 3),
 
