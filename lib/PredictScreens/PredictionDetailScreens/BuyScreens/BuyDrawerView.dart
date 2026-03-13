@@ -205,7 +205,7 @@ class _BuySheetState extends State<_BuySheet> {
   Widget build(BuildContext context) {
     final isDark = context.watch<ThemeController>().isDarkMode;
     final card   = Theme.of(context).primaryColorDark;
-    final bg     = Theme.of(context).scaffoldBackgroundColor;
+    final bg     = Theme.of(context).scaffoldBackgroundColor.withOpacity(0.99);
     final txt    = isDark ? Colors.white : Colors.black87;
     final divC   = Theme.of(context).dividerColor;
     final user   = context.watch<UserViewModel>().user;
@@ -605,6 +605,8 @@ class _BuySheetState extends State<_BuySheet> {
                   value: _expirationEnabled,
                   onChanged: (v) => setState(() => _expirationEnabled = v),
                   activeColor: const Color(0xFFD3983B),
+                  inactiveThumbColor: Colors.grey,
+                  inactiveTrackColor: Theme.of(context).dividerColor,
                 ),
               ]),
             ),

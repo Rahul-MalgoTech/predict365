@@ -9,6 +9,7 @@ import 'package:predict365/Reusable_Widgets/AppText_Theme/AppText_Theme.dart';
 import 'package:predict365/Reusable_Widgets/BondingNavigator.dart';
 import 'package:predict365/Reusable_Widgets/ReuseableGradientContainer/ReusableGradientContainer.dart';
 import 'package:predict365/Reusable_Widgets/ShimmerLoaderWidget/ShimmerWidget.dart';
+import 'package:predict365/ViewModel/BookmarkVM.dart';
 import 'package:predict365/ViewModel/CategoryVM.dart';
 import 'package:predict365/ViewModel/EventVM.dart';
 import 'package:predict365/ViewModel/UserVM.dart';
@@ -61,17 +62,13 @@ class _HomeScreenState extends State<HomeScreen> {
 
                   return Row(
                     children: [
-                      // Logo
                       Image.asset(
                         isDark
                             ? "assets/images/predictlogowhite.png"
                             : "assets/images/predictlogo.png",
                         height: 22,
                       ),
-
                       const Spacer(),
-
-                      // Balance button — intrinsic width, never truncates
                       GestureDetector(
                         onTap: () => predictNavigator.newPage(context, page: DepositScreen()),
                         child: Container(
@@ -96,7 +93,6 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                         ),
                       ),
-
                       const SizedBox(width: 8),
                       ThemeToggleIcon(),
                       const SizedBox(width: 8),
@@ -121,7 +117,7 @@ class _HomeScreenState extends State<HomeScreen> {
               height: 26,
               child: Consumer<CategoryViewModel>(
                 builder: (context, catVm, _) {
-                  final cats = catVm.categoryNames; // ['Trending', ...API names]
+                  final cats = catVm.categoryNames;
                   return ListView.builder(
                     scrollDirection: Axis.horizontal,
                     padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -130,16 +126,10 @@ class _HomeScreenState extends State<HomeScreen> {
                       final isSelected = selectedCategory == i;
                       return GestureDetector(
                         onTap: () {
-                          if (selectedCategory == i) return; // already active
+                          if (selectedCategory == i) return;
                           setState(() => selectedCategory = i);
-                          // i == 0 → "Trending" → show all
-                          // i == 1 → "All"      → show all
-                          // i >= 2 → API category → filter by _id
-                          final categoryId = i < 2
-                              ? null
-                              : catVm.categories[i - 2].id;
-                          context.read<EventViewModel>()
-                              .filterByCategory(categoryId);
+                          final categoryId = i < 2 ? null : catVm.categories[i - 2].id;
+                          context.read<EventViewModel>().filterByCategory(categoryId);
                         },
                         child: Padding(
                           padding: const EdgeInsets.only(right: 20),
@@ -149,8 +139,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             color: isSelected
                                 ? Theme.of(context).textTheme.labelLarge!.color
                                 : Colors.grey.shade600,
-                            fontWeight:
-                            isSelected ? FontWeight.w500 : FontWeight.w400,
+                            fontWeight: isSelected ? FontWeight.w500 : FontWeight.w400,
                           ),
                         ),
                       );
@@ -169,10 +158,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   ? HomeScreenSkeleton()
                   : Consumer<EventViewModel>(
                 builder: (context, vm, _) {
-                  // Only show shimmer on initial load, not on category switch
                   if (vm.isLoading) return HomeScreenSkeleton();
-
-                  final events = vm.events; // already filtered client-side
+                  final events = vm.events;
 
                   return SingleChildScrollView(
                     child: Column(
@@ -277,42 +264,31 @@ class _HomeScreenState extends State<HomeScreen> {
                                           .withValues(alpha: 0.5),
                                       shape: BoxShape.circle,
                                     ),
-                                    child: Icon(
-                                      Icons.inbox_outlined,
-                                      size: 36,
-                                      color: Colors.grey.shade400,
-                                    ),
+                                    child: Icon(Icons.inbox_outlined,
+                                        size: 36, color: Colors.grey.shade400),
                                   ),
                                   const SizedBox(height: 16),
-                                  AppText(
-                                    "No events found",
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w600,
-                                  ),
+                                  AppText("No events found",
+                                      fontSize: 16, fontWeight: FontWeight.w600),
                                   const SizedBox(height: 6),
                                   AppText(
                                     "There are no predictions in this\ncategory right now.",
-                                    fontSize: 13,
-                                    color: Colors.grey.shade500,
+                                    fontSize: 13, color: Colors.grey.shade500,
                                   ),
                                   const SizedBox(height: 20),
                                   GestureDetector(
                                     onTap: () {
                                       setState(() => selectedCategory = 0);
-                                      context
-                                          .read<EventViewModel>()
-                                          .filterByCategory(null);
+                                      context.read<EventViewModel>().filterByCategory(null);
                                     },
                                     child: GradientContainer(
                                       child: Padding(
                                         padding: const EdgeInsets.symmetric(
                                             horizontal: 20, vertical: 9),
-                                        child: AppText(
-                                          "View All Events",
-                                          fontSize: 13,
-                                          fontWeight: FontWeight.w600,
-                                          color: Colors.white,
-                                        ),
+                                        child: AppText("View All Events",
+                                            fontSize: 13,
+                                            fontWeight: FontWeight.w600,
+                                            color: Colors.white),
                                       ),
                                     ),
                                   ),
@@ -380,23 +356,10 @@ class _HomeScreenState extends State<HomeScreen> {
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }
-
-  String _formatPool(double pool) =>
-      pool > 0 ? '₹${pool.toStringAsFixed(2)} Vol' : '₹0.00 Vol';
-
-  String _timeLeft(DateTime? endDate) {
-    if (endDate == null) return '--';
-    final diff = endDate.difference(DateTime.now());
-    if (diff.isNegative) return 'Ended';
-    final h = diff.inHours;
-    final m = diff.inMinutes % 60;
-    final s = diff.inSeconds % 60;
-    return '${h}h ${m}m ${s}s';
-  }
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// EXISTING WIDGETS — zero UI changes
+// EXISTING WIDGETS
 // ─────────────────────────────────────────────────────────────────────────────
 
 class CategoryItem extends StatelessWidget {
@@ -422,8 +385,7 @@ class CategoryItem extends StatelessWidget {
           if (selected) ...[
             const SizedBox(height: 3),
             Container(
-              height: 2,
-              width: 20,
+              height: 2, width: 20,
               decoration: BoxDecoration(
                 gradient: const LinearGradient(
                   colors: [Color(0xFF977032), Color(0xFFF5A623)],
@@ -468,8 +430,7 @@ class QuickCard extends StatelessWidget {
         ),
         if (badge.isNotEmpty)
           Positioned(
-            top: -7,
-            right: 6,
+            top: -7, right: 6,
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
               decoration: BoxDecoration(
@@ -488,22 +449,67 @@ class QuickCard extends StatelessWidget {
   }
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// BOOKMARK STAR ICON — reusable, reads BookmarkViewModel
+// ─────────────────────────────────────────────────────────────────────────────
+class _BookmarkStar extends StatelessWidget {
+  final String eventId;
+  const _BookmarkStar({required this.eventId});
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<BookmarkViewModel>(
+      builder: (context, bVm, _) {
+        final bookmarked = bVm.isBookmarked(eventId);
+        final pending    = bVm.isPending(eventId);
+
+        return GestureDetector(
+          onTap: pending ? null : () => bVm.toggleBookmark(eventId),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            padding: const EdgeInsets.all(6),
+            decoration: BoxDecoration(
+              color: bookmarked
+                  ? const Color(0xFFF5A623).withValues(alpha: 0.15)
+                  : Colors.grey.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: pending
+                ? SizedBox(
+              width: 16, height: 16,
+              child: CircularProgressIndicator(
+                strokeWidth: 1.5,
+                color: Colors.grey.shade500,
+              ),
+            )
+                : Icon(
+              bookmarked ? Icons.star : Icons.star_border,
+              size: 16,
+              color: bookmarked
+                  ? const Color(0xFFF5A623)
+                  : Colors.grey,
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
 
 // ─────────────────────────────────────────────────────────────────────────────
-// SINGLE MARKET CARD  —  matches website left card style
+// SINGLE MARKET CARD
 // ─────────────────────────────────────────────────────────────────────────────
-
 class SingleMarketCard extends StatelessWidget {
   final EventModel event;
   const SingleMarketCard({super.key, required this.event});
 
   @override
   Widget build(BuildContext context) {
-    final m      = event.primaryMarket;
-    final isOpen = m?.isOpen ?? false;
+    final m = event.primaryMarket;
 
     return GestureDetector(
-      onTap: () => predictNavigator.newPage(context, page: PredikDetailScreen(eventId: event.id)),
+      onTap: () => predictNavigator.newPage(
+          context, page: PredikDetailScreen(eventId: event.id)),
       child: Container(
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
@@ -536,7 +542,8 @@ class SingleMarketCard extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 8),
-                _iconBtn(Icons.star_border),
+                // ★ Bookmark star — calls API on tap
+                _BookmarkStar(eventId: event.id),
                 const SizedBox(width: 6),
                 _iconBtn(Icons.access_time_outlined),
               ],
@@ -544,11 +551,9 @@ class SingleMarketCard extends StatelessWidget {
 
             const SizedBox(height: 14),
 
-            // ── Yes / No percentages ──
             Row(
               children: [
-                AppText("48%",
-                    fontSize: 15, fontWeight: FontWeight.w600),
+                AppText("48%", fontSize: 15, fontWeight: FontWeight.w600),
                 const SizedBox(width: 6),
                 AppText(m?.side1 ?? 'Yes',
                     fontSize: 14, color: Colors.green, fontWeight: FontWeight.w500),
@@ -556,33 +561,24 @@ class SingleMarketCard extends StatelessWidget {
                 AppText(m?.side2 ?? 'No',
                     fontSize: 14, color: Colors.red, fontWeight: FontWeight.w500),
                 const SizedBox(width: 6),
-                AppText("52%",
-                    fontSize: 15, fontWeight: FontWeight.w600),
+                AppText("52%", fontSize: 15, fontWeight: FontWeight.w600),
               ],
             ),
 
             const SizedBox(height: 8),
 
-            // ── Progress bar ──
             ClipRRect(
               borderRadius: BorderRadius.circular(4),
               child: Row(
                 children: [
-                  Expanded(
-                    flex: 48,
-                    child: Container(height: 5, color: Colors.green),
-                  ),
-                  Expanded(
-                    flex: 52,
-                    child: Container(height: 5, color: Colors.red),
-                  ),
+                  Expanded(flex: 48, child: Container(height: 5, color: Colors.green)),
+                  Expanded(flex: 52, child: Container(height: 5, color: Colors.red)),
                 ],
               ),
             ),
 
             const SizedBox(height: 14),
 
-            // ── Yes / No bet buttons ──
             Row(
               children: [
                 Expanded(child: _betButton(context, m?.side1 ?? 'Yes', '49¢', Colors.green)),
@@ -593,20 +589,14 @@ class SingleMarketCard extends StatelessWidget {
 
             const SizedBox(height: 14),
 
-            // ── Footer ──
             Row(
               children: [
-                AppText(
-                  '\$ ${event.totalPoolInUsd.toStringAsFixed(0)} Vol',
-                  fontSize: 13,
-                  color: Colors.grey,
-                ),
+                AppText('\$ ${event.totalPoolInUsd.toStringAsFixed(0)} Vol',
+                    fontSize: 13, color: Colors.grey),
                 const Spacer(),
                 AppText(
-                  '${event.subMarkets.length} Market${event.subMarkets.length == 1 ? '' : 's'}',
-                  fontSize: 13,
-                  color: Colors.grey,
-                ),
+                    '${event.subMarkets.length} Market${event.subMarkets.length == 1 ? '' : 's'}',
+                    fontSize: 13, color: Colors.grey),
               ],
             ),
           ],
@@ -615,39 +605,31 @@ class SingleMarketCard extends StatelessWidget {
     );
   }
 
-  Widget _iconBtn(IconData icon) {
-    return Container(
-      padding: const EdgeInsets.all(6),
-      decoration: BoxDecoration(
-        color: Colors.grey.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Icon(icon, size: 16, color: Colors.grey),
-    );
-  }
+  Widget _iconBtn(IconData icon) => Container(
+    padding: const EdgeInsets.all(6),
+    decoration: BoxDecoration(
+      color: Colors.grey.withValues(alpha: 0.12),
+      borderRadius: BorderRadius.circular(8),
+    ),
+    child: Icon(icon, size: 16, color: Colors.grey),
+  );
 
-  Widget _betButton(BuildContext context, String label, String price, Color color) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 11),
-      alignment: Alignment.center,
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.15),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: AppText(
-        '$label $price',
-        fontSize: 14,
-        fontWeight: FontWeight.w600,
-        color: color,
-      ),
-    );
-  }
+  Widget _betButton(BuildContext context, String label, String price, Color color) =>
+      Container(
+        padding: const EdgeInsets.symmetric(vertical: 11),
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: color.withValues(alpha: 0.15),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: AppText('$label $price',
+            fontSize: 14, fontWeight: FontWeight.w600, color: color),
+      );
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// MULTI MARKET CARD  —  matches website right card style
+// MULTI MARKET CARD
 // ─────────────────────────────────────────────────────────────────────────────
-
 class MultiMarketCard extends StatelessWidget {
   final EventModel event;
   const MultiMarketCard({super.key, required this.event});
@@ -655,7 +637,8 @@ class MultiMarketCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => predictNavigator.newPage(context, page: PredikDetailScreen(eventId: event.id)),
+      onTap: () => predictNavigator.newPage(
+          context, page: PredikDetailScreen(eventId: event.id)),
       child: Container(
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
@@ -688,7 +671,8 @@ class MultiMarketCard extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 8),
-                _iconBtn(Icons.star_border),
+                // ★ Bookmark star — calls API on tap
+                _BookmarkStar(eventId: event.id),
                 const SizedBox(width: 6),
                 _iconBtn(Icons.access_time_outlined),
               ],
@@ -696,19 +680,16 @@ class MultiMarketCard extends StatelessWidget {
 
             const SizedBox(height: 14),
 
-            // ── Sub-market rows (max 3 shown) ──
             ...event.subMarkets.take(3).map((m) => Padding(
               padding: const EdgeInsets.only(bottom: 10),
               child: Row(
                 children: [
                   Expanded(
-                    child: AppText(
-                      m.name,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w400,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
+                    child: AppText(m.name,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w400,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis),
                   ),
                   const SizedBox(width: 8),
                   _betBtn(context, m.side1, Colors.green),
@@ -722,20 +703,14 @@ class MultiMarketCard extends StatelessWidget {
             Divider(color: Theme.of(context).dividerColor, thickness: 1),
             const SizedBox(height: 8),
 
-            // ── Footer ──
             Row(
               children: [
-                AppText(
-                  '\$ ${event.totalPoolInUsd.toStringAsFixed(0)} Vol',
-                  fontSize: 13,
-                  color: Colors.grey,
-                ),
+                AppText('\$ ${event.totalPoolInUsd.toStringAsFixed(0)} Vol',
+                    fontSize: 13, color: Colors.grey),
                 const Spacer(),
                 AppText(
-                  '${event.subMarkets.length} Market${event.subMarkets.length == 1 ? '' : 's'}',
-                  fontSize: 13,
-                  color: Colors.grey,
-                ),
+                    '${event.subMarkets.length} Market${event.subMarkets.length == 1 ? '' : 's'}',
+                    fontSize: 13, color: Colors.grey),
               ],
             ),
           ],
@@ -744,32 +719,22 @@ class MultiMarketCard extends StatelessWidget {
     );
   }
 
-  Widget _iconBtn(IconData icon) {
-    return Container(
-      padding: const EdgeInsets.all(6),
-      decoration: BoxDecoration(
-        color: Colors.grey.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Icon(icon, size: 16, color: Colors.grey),
-    );
-  }
+  Widget _iconBtn(IconData icon) => Container(
+    padding: const EdgeInsets.all(6),
+    decoration: BoxDecoration(
+      color: Colors.grey.withValues(alpha: 0.12),
+      borderRadius: BorderRadius.circular(8),
+    ),
+    child: Icon(icon, size: 16, color: Colors.grey),
+  );
 
-  Widget _betBtn(BuildContext context, String label, Color color) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.15),
-        borderRadius: BorderRadius.circular(6),
-      ),
-      child: Text(
-        label,
-        style: TextStyle(
-          color: color,
-          fontSize: 13,
-          fontWeight: FontWeight.w600,
-        ),
-      ),
-    );
-  }
+  Widget _betBtn(BuildContext context, String label, Color color) => Container(
+    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+    decoration: BoxDecoration(
+      color: color.withValues(alpha: 0.15),
+      borderRadius: BorderRadius.circular(6),
+    ),
+    child: Text(label,
+        style: TextStyle(color: color, fontSize: 13, fontWeight: FontWeight.w600)),
+  );
 }

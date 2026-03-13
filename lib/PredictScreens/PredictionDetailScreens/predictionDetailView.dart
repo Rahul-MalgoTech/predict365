@@ -4,9 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:predict365/Models/EventModel.dart';
 import 'package:predict365/Models/OrderBookModel.dart';
 import 'package:predict365/PredictScreens/DepositWithdrawScreen/DepositWithdrawScreen.dart';
+import 'package:predict365/PredictScreens/PredictionDetailScreens/ActivityTab/ActivityTabView.dart';
 import 'package:predict365/PredictScreens/PredictionDetailScreens/BuyScreens/BuyDrawerView.dart';
 import 'package:predict365/PredictScreens/PredictionDetailScreens/BuyScreens/OrderBookService.dart';
 import 'package:predict365/PredictScreens/PredictionDetailScreens/Chart/PriceLineChart.dart';
+import 'package:predict365/PredictScreens/PredictionDetailScreens/CommentTab/CommentTabView.dart';
 import 'package:predict365/Predict_Utils/App_Theme/App_Theme.dart';
 import 'package:predict365/Predict_Utils/ColorHandlers/AppColors.dart';
 import 'package:predict365/Reusable_Widgets/AppText_Theme/AppText_Theme.dart';
@@ -15,6 +17,8 @@ import 'package:predict365/Reusable_Widgets/ReuseableGradientContainer/ReusableG
 import 'package:predict365/Reusable_Widgets/ShimmerLoaderWidget/ShimmerWidget.dart';
 import 'package:predict365/ViewModel/EventDetailVM.dart';
 import 'package:predict365/ViewModel/MarketChartVM.dart';
+import 'package:predict365/ViewModel/ActivityVM.dart';
+import 'package:predict365/ViewModel/ThoughtsVM.dart';
 import 'package:predict365/ViewModel/UserVM.dart';
 import 'package:provider/provider.dart';
 
@@ -34,6 +38,14 @@ class PredikDetailScreen extends StatelessWidget {
         ),
         ChangeNotifierProvider(
           create: (_) => MarketDataViewModel()..fetchData(eventId),
+        ),
+        // ActivityViewModel provided here so ActivityTabView can read it
+        ChangeNotifierProvider(
+          create: (_) => ActivityViewModel(),
+        ),
+        // ThoughtViewModel provided here so CommentsTabView can read it
+        ChangeNotifierProvider(
+          create: (_) => ThoughtViewModel(),
         ),
       ],
       child: const _DetailBody(),
@@ -57,6 +69,7 @@ class _DetailBodyState extends State<_DetailBody> {
   bool   _rulesExpanded     = true;
 
   final List<String> _timeRanges = ['1H', '6H', '1D', '1W', '1M', 'ALL'];
+  final List<String> _tabs       = ['Activity', 'Holders', 'Comments'];
 
   // ── Order book per sub-market ─────────────────────────────────
   final Map<String, OrderBookService> _obServices = {};
@@ -124,20 +137,47 @@ class _DetailBodyState extends State<_DetailBody> {
                   ))
                 else if (vm.event != null)
                     Expanded(
-                      child: SingleChildScrollView(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            _buildVolumeRow(context, vm.event!),
-                            _buildQuestionCard(context, vm.event!),
-                            _buildTimeRangeSelector(context, vm.event!),
-                            _buildBettingOptions(context, vm.event!),
-                            _buildAboutSection(context, vm.event!),
-                            _buildRulesSection(context, vm.event!),
-                            _buildActivitySection(context),
-                            const SizedBox(height: 24),
-                          ],
-                        ),
+                      child: CustomScrollView(
+                        slivers: [
+                          // ── Everything above the tab bar ─────────────
+                          SliverToBoxAdapter(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                _buildVolumeRow(context, vm.event!),
+                                _buildQuestionCard(context, vm.event!),
+                                _buildTimeRangeSelector(context, vm.event!),
+                                _buildBettingOptions(context, vm.event!),
+                                _buildAboutSection(context, vm.event!),
+                                _buildRulesSection(context, vm.event!),
+                                Divider(
+                                    color: Theme.of(context).dividerColor,
+                                    thickness: 1),
+                              ],
+                            ),
+                          ),
+
+                          // ── Tab bar — sticks to top when scrolled ─────
+                          SliverPersistentHeader(
+                            pinned: true,
+                            delegate: _PinnedTabBarDelegate(
+                              backgroundColor:
+                              Theme.of(context).scaffoldBackgroundColor.withOpacity(0.99),
+                              child: _buildTabBar(context),
+                            ),
+                          ),
+
+                          // ── Tab content ───────────────────────────────
+                          SliverToBoxAdapter(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                _buildTabBody(context, vm.event!),
+                                const SizedBox(height: 24),
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
                     ),
               ],
@@ -369,7 +409,6 @@ class _DetailBodyState extends State<_DetailBody> {
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Column(
         children: event.subMarkets.map((m) {
-          // Connect order book for this sub-market lazily
           _connectOrderBook(m);
           final book    = _obBooks[m.id] ?? OrderBook.empty();
           final loading = _obLoading[m.id] ?? true;
@@ -379,7 +418,6 @@ class _DetailBodyState extends State<_DetailBody> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Sub-market name
                 AppText(m.name,
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
@@ -387,7 +425,6 @@ class _DetailBodyState extends State<_DetailBody> {
                     overflow: TextOverflow.ellipsis),
                 const SizedBox(height: 4),
 
-                // Status + region
                 Row(
                   children: [
                     Container(
@@ -415,7 +452,6 @@ class _DetailBodyState extends State<_DetailBody> {
                 const SizedBox(height: 10),
 
                 if (m.isOpen) ...[
-                  // ── Yes / No buttons → open bottom sheet ───────
                   Row(
                     children: [
                       Expanded(
@@ -436,20 +472,13 @@ class _DetailBodyState extends State<_DetailBody> {
                     ],
                   ),
                   const SizedBox(height: 14),
-
-                  // ── Order Book ──────────────────────────────────
                   _DetailOrderBook(
-                    book:      book,
-                    loading:   loading,
-                    subMarket: m,
-                    event:     event,
+                    book: book, loading: loading,
+                    subMarket: m, event: event,
                   ),
                 ] else ...[
-                  // ── Settling: badge + inline order book ────────
                   Row(mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-
-
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 5),
                         decoration: BoxDecoration(
@@ -460,10 +489,8 @@ class _DetailBodyState extends State<_DetailBody> {
                         child: Text(
                           m.status.toUpperCase(),
                           style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w700,
-                            color: Colors.grey.shade400,
-                            letterSpacing: 0.5,
+                            fontSize: 12, fontWeight: FontWeight.w700,
+                            color: Colors.grey.shade400, letterSpacing: 0.5,
                           ),
                         ),
                       ),
@@ -471,11 +498,8 @@ class _DetailBodyState extends State<_DetailBody> {
                   ),
                   const SizedBox(height: 14),
                   _DetailOrderBook(
-                    book:      book,
-                    loading:   loading,
-                    subMarket: m,
-                    event:     event,
-                    readOnly:  true,
+                    book: book, loading: loading,
+                    subMarket: m, event: event, readOnly: true,
                   ),
                 ],
               ],
@@ -617,57 +641,100 @@ class _DetailBodyState extends State<_DetailBody> {
     );
   }
 
-  // ── ACTIVITY / HOLDERS / COMMENTS ─────────────────────────────
-  Widget _buildActivitySection(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Divider(color: Theme.of(context).dividerColor, thickness: 1),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-          child: Row(
-            children: ['Activity', 'Holders', 'Comments']
-                .asMap().entries.map((e) {
-              final sel = _selectedTabIndex == e.key;
-              return GestureDetector(
-                onTap: () => setState(() => _selectedTabIndex = e.key),
-                child: Container(
-                  margin: const EdgeInsets.only(right: 20),
-                  padding: const EdgeInsets.only(bottom: 4),
-                  decoration: sel
-                      ? BoxDecoration(
-                    border: Border(bottom: BorderSide(
-                      color: Theme.of(context).textTheme.labelLarge!.color!,
-                      width: 2,
-                    )),
-                  )
-                      : null,
-                  child: AppText(e.value,
-                      fontSize: 16,
-                      fontWeight: sel ? FontWeight.w700 : FontWeight.w400,
-                      color: sel ? null : Colors.grey),
+  // ── PINNED TAB BAR (extracted for SliverPersistentHeader) ────────
+  Widget _buildTabBar(BuildContext context) {
+    return Container(
+      color: Theme.of(context).scaffoldBackgroundColor.withOpacity(0.99),
+      alignment: Alignment.centerLeft,
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Row(
+        children: _tabs.asMap().entries.map((e) {
+          final sel = _selectedTabIndex == e.key;
+          return GestureDetector(
+            onTap: () => setState(() => _selectedTabIndex = e.key),
+            child: Container(
+              margin: const EdgeInsets.only(right: 20),
+              padding: const EdgeInsets.only(bottom: 4),
+              decoration: sel
+                  ? BoxDecoration(
+                border: Border(
+                  bottom: BorderSide(
+                    color: Theme.of(context)
+                        .textTheme
+                        .labelLarge!
+                        .color!,
+                    width: 2,
+                  ),
                 ),
-              );
-            }).toList(),
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
-          child: Center(
-            child: AppText(
-              'No ${['activity', 'holders', 'comments'][_selectedTabIndex]} yet.',
-              fontSize: 14, color: Colors.grey.shade500,
+              )
+                  : null,
+              child: AppText(
+                e.value,
+                fontSize: 16,
+                fontWeight: sel ? FontWeight.w700 : FontWeight.w400,
+                color: sel ? null : Colors.grey,
+              ),
             ),
-          ),
+          );
+        }).toList(),
+      ),
+    );
+  }
+
+  // ── TAB BODY ──────────────────────────────────────────────────
+  Widget _buildTabBody(BuildContext context, EventModel event) {
+    if (_selectedTabIndex == 0) {
+      return ActivityTabView(eventId: event.id);
+    } else if (_selectedTabIndex == 2) {
+      return CommentsTabView(eventId: event.id);
+    }
+    // Holders — stub
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+      child: Center(
+        child: AppText(
+          'No ${_tabs[_selectedTabIndex].toLowerCase()} yet.',
+          fontSize: 14,
+          color: Colors.grey.shade500,
         ),
-      ],
+      ),
     );
   }
 }
 
 // ══════════════════════════════════════════════════════════════════
+// PINNED TAB BAR DELEGATE
+// Keeps the Activity / Holders / Comments tab bar stuck to the top
+// of the screen while the user scrolls through content below it.
+// ══════════════════════════════════════════════════════════════════
+class _PinnedTabBarDelegate extends SliverPersistentHeaderDelegate {
+  final Widget child;
+  final Color  backgroundColor;
+
+  const _PinnedTabBarDelegate({
+    required this.child,
+    required this.backgroundColor,
+  });
+
+  // Tab bar height: 16 top + 20 text + 4 underline pad + 16 bottom = 56
+  static const double _height = 56.0;
+
+  @override double get minExtent => _height;
+  @override double get maxExtent => _height;
+
+  @override
+  Widget build(
+      BuildContext context, double shrinkOffset, bool overlapsContent) {
+    return SizedBox.expand(child: child);
+  }
+
+  @override
+  bool shouldRebuild(_PinnedTabBarDelegate old) =>
+      old.child != child || old.backgroundColor != backgroundColor;
+}
+
+// ══════════════════════════════════════════════════════════════════
 // ORDER BOOK — shown inline on detail screen
-// tapping a row opens buy sheet with that price pre-filled
 // ══════════════════════════════════════════════════════════════════
 class _DetailOrderBook extends StatefulWidget {
   final OrderBook  book;
@@ -703,8 +770,6 @@ class _DetailOrderBookState extends State<_DetailOrderBook> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-
-        // header
         Row(children: [
           Text('Order Book',
               style: TextStyle(
@@ -719,7 +784,6 @@ class _DetailOrderBookState extends State<_DetailOrderBook> {
         ]),
         const SizedBox(height: 8),
 
-        // column headers
         Row(children: [
           SizedBox(width: 48,
               child: Text('TOTAL',
@@ -748,7 +812,6 @@ class _DetailOrderBookState extends State<_DetailOrderBook> {
         ]),
         const SizedBox(height: 4),
 
-        // rows or skeleton
         if (widget.loading && book.asks.isEmpty && book.bids.isEmpty)
           _buildSkeleton()
         else
@@ -781,33 +844,25 @@ class _DetailOrderBookState extends State<_DetailOrderBook> {
     return Column(children: [
       ...shownAsks.map((a) => GestureDetector(
         onTap: widget.readOnly ? null : () => showBuySheet(context,
-            subMarket: widget.subMarket,
-            event: widget.event,
+            subMarket: widget.subMarket, event: widget.event,
             initialIsYes: true,
             initialPrice: (a.price * 100).roundToDouble()),
         child: _askRow(a, maxA),
       )),
       if (asks.length > _pageSize)
-        _moreBtn(
-          showing: _showAllAsks, total: asks.length,
-          onTap: () => setState(() => _showAllAsks = !_showAllAsks),
-          isAsk: true,
-        ),
+        _moreBtn(showing: _showAllAsks, total: asks.length,
+            onTap: () => setState(() => _showAllAsks = !_showAllAsks), isAsk: true),
       _spreadRow(book, divC),
       ...shownBids.map((b) => GestureDetector(
         onTap: widget.readOnly ? null : () => showBuySheet(context,
-            subMarket: widget.subMarket,
-            event: widget.event,
+            subMarket: widget.subMarket, event: widget.event,
             initialIsYes: false,
             initialPrice: (b.price * 100).roundToDouble()),
         child: _bidRow(b, maxB),
       )),
       if (bids.length > _pageSize)
-        _moreBtn(
-          showing: _showAllBids, total: bids.length,
-          onTap: () => setState(() => _showAllBids = !_showAllBids),
-          isAsk: false,
-        ),
+        _moreBtn(showing: _showAllBids, total: bids.length,
+            onTap: () => setState(() => _showAllBids = !_showAllBids), isAsk: false),
     ]);
   }
 
@@ -824,27 +879,17 @@ class _DetailOrderBookState extends State<_DetailOrderBook> {
                 style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700,
                     color: Color(0xFFE05252)),
                 textAlign: TextAlign.center)),
-        Expanded(child: Stack(
-          alignment: Alignment.centerLeft,
-          children: [
-            Align(
-              alignment: Alignment.centerLeft,
-              child: FractionallySizedBox(
-                widthFactor: frac,
-                child: Container(
-                  height: 24,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFE05252).withValues(alpha: 0.15),
-                    borderRadius: const BorderRadius.only(
-                      topRight: Radius.circular(12),
-                      bottomRight: Radius.circular(12),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(left: 4),
+        Expanded(child: Stack(alignment: Alignment.centerLeft, children: [
+          Align(alignment: Alignment.centerLeft,
+              child: FractionallySizedBox(widthFactor: frac,
+                child: Container(height: 24,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFE05252).withValues(alpha: 0.15),
+                      borderRadius: const BorderRadius.only(
+                          topRight: Radius.circular(12), bottomRight: Radius.circular(12)),
+                    )),
+              )),
+          Padding(padding: const EdgeInsets.only(left: 4),
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
@@ -852,13 +897,10 @@ class _DetailOrderBookState extends State<_DetailOrderBook> {
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Text(ask.shares.toStringAsFixed(0),
-                    style: const TextStyle(fontSize: 10,
-                        fontWeight: FontWeight.w700,
+                    style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w700,
                         color: Color(0xFFE05252))),
-              ),
-            ),
-          ],
-        )),
+              )),
+        ])),
         const SizedBox(width: 6),
         SizedBox(width: 48,
             child: Text(ask.totalLabel,
@@ -878,27 +920,17 @@ class _DetailOrderBookState extends State<_DetailOrderBook> {
                 style: TextStyle(fontSize: 10, color: Colors.grey.shade500),
                 textAlign: TextAlign.left)),
         const SizedBox(width: 6),
-        Expanded(child: Stack(
-          alignment: Alignment.centerRight,
-          children: [
-            Align(
-              alignment: Alignment.centerRight,
-              child: FractionallySizedBox(
-                widthFactor: frac,
-                child: Container(
-                  height: 24,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF4DD9A0).withValues(alpha: 0.15),
-                    borderRadius: const BorderRadius.only(
-                      topLeft: Radius.circular(12),
-                      bottomLeft: Radius.circular(12),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(right: 4),
+        Expanded(child: Stack(alignment: Alignment.centerRight, children: [
+          Align(alignment: Alignment.centerRight,
+              child: FractionallySizedBox(widthFactor: frac,
+                child: Container(height: 24,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF4DD9A0).withValues(alpha: 0.15),
+                      borderRadius: const BorderRadius.only(
+                          topLeft: Radius.circular(12), bottomLeft: Radius.circular(12)),
+                    )),
+              )),
+          Padding(padding: const EdgeInsets.only(right: 4),
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
@@ -906,13 +938,10 @@ class _DetailOrderBookState extends State<_DetailOrderBook> {
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Text(bid.shares.toStringAsFixed(0),
-                    style: const TextStyle(fontSize: 10,
-                        fontWeight: FontWeight.w700,
+                    style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w700,
                         color: Color(0xFF4DD9A0))),
-              ),
-            ),
-          ],
-        )),
+              )),
+        ])),
         SizedBox(width: 52,
             child: Text(bid.priceLabel,
                 style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700,
@@ -931,35 +960,26 @@ class _DetailOrderBookState extends State<_DetailOrderBook> {
       final lineWidth = (total - pillWidth) / 2 - 4;
       return Padding(
         padding: const EdgeInsets.symmetric(vertical: 5),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            SizedBox(width: lineWidth, height: 1,
-                child: DecoratedBox(decoration: BoxDecoration(color: Colors.grey.shade700))),
-            const SizedBox(width: 4),
-            Container(
-              width: pillWidth,
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              decoration: BoxDecoration(
-                color: divC,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text('Spread  ${book.spreadLabel}',
-                      style: TextStyle(fontSize: 10, color: Colors.grey.shade400)),
-                  const SizedBox(width: 8),
-                  Text('LTP  ${book.ltpLabel}',
-                      style: TextStyle(fontSize: 10, color: Colors.grey.shade400)),
-                ],
-              ),
-            ),
-            const SizedBox(width: 4),
-            SizedBox(width: lineWidth, height: 1,
-                child: DecoratedBox(decoration: BoxDecoration(color: Colors.grey.shade700))),
-          ],
-        ),
+        child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+          SizedBox(width: lineWidth, height: 1,
+              child: DecoratedBox(decoration: BoxDecoration(color: Colors.grey.shade700))),
+          const SizedBox(width: 4),
+          Container(
+            width: pillWidth,
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            decoration: BoxDecoration(color: divC, borderRadius: BorderRadius.circular(20)),
+            child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+              Text('Spread  ${book.spreadLabel}',
+                  style: TextStyle(fontSize: 10, color: Colors.grey.shade400)),
+              const SizedBox(width: 8),
+              Text('LTP  ${book.ltpLabel}',
+                  style: TextStyle(fontSize: 10, color: Colors.grey.shade400)),
+            ]),
+          ),
+          const SizedBox(width: 4),
+          SizedBox(width: lineWidth, height: 1,
+              child: DecoratedBox(decoration: BoxDecoration(color: Colors.grey.shade700))),
+        ]),
       );
     });
   }
@@ -991,12 +1011,9 @@ class _DetailOrderBookState extends State<_DetailOrderBook> {
         padding: const EdgeInsets.symmetric(vertical: 3),
         child: Row(children: [
           _sk(48), const SizedBox(width: 6),
-          Expanded(child: _sk(20)),
-          const SizedBox(width: 4),
-          _sk(48),
-          const SizedBox(width: 4),
-          Expanded(child: _sk(20)),
-          const SizedBox(width: 6),
+          Expanded(child: _sk(20)), const SizedBox(width: 4),
+          _sk(48), const SizedBox(width: 4),
+          Expanded(child: _sk(20)), const SizedBox(width: 6),
           _sk(48),
         ]),
       )),
@@ -1035,16 +1052,14 @@ class _DetailSkeleton extends StatelessWidget {
             Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
               ShimmerBox(width: 52, height: 52, radius: 8),
               const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    ShimmerBox(width: double.infinity, height: 16),
-                    const SizedBox(height: 8),
-                    ShimmerBox(width: sw * 0.55, height: 16),
-                  ],
-                ),
-              ),
+              Expanded(child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  ShimmerBox(width: double.infinity, height: 16),
+                  const SizedBox(height: 8),
+                  ShimmerBox(width: sw * 0.55, height: 16),
+                ],
+              )),
             ]),
             const SizedBox(height: 10),
             ShimmerBox(width: sw * 0.7, height: 13),

@@ -91,11 +91,11 @@ class SubMarket {
       status:               json['status']           ?? '',
       result:               json['result'],
       canCloseEarly:        json['can_close_early']  ?? false,
-      settlementTime:       json['settlement_time']  ?? 0,
+      settlementTime:       (json['settlement_time'] as num?)?.toInt() ?? 0,
       resolutionState:      json['resolution_state'] ?? '',
-      disputeCount:         json['dispute_count']    ?? 0,
+      disputeCount:         (json['dispute_count'] as num?)?.toInt() ?? 0,
       bondAmount:           (json['bond_amount'] as num?)?.toDouble() ?? 0,
-      resolutionWindow:     json['resolution_window'] ?? 0,
+      resolutionWindow:     (json['resolution_window'] as num?)?.toInt() ?? 0,
       side1:                json['side_1'] ?? 'Yes',
       side2:                json['side_2'] ?? 'No',
       lastTradedSide1Price: (json['lastTradedSide1Price'] as num?)?.toDouble(),
@@ -124,23 +124,23 @@ class EventRegion {
 }
 
 class EventModel {
-  final String         id;
-  final String         eventTitle;
-  final String         eventImage;
-  final String         category;
-  final String         subCategory;
-  final bool           hasSubMarkets;
+  final String          id;
+  final String          eventTitle;
+  final String          eventImage;
+  final String          category;
+  final String          subCategory;
+  final bool            hasSubMarkets;
   final List<SubMarket> subMarkets;
-  final DateTime?      listDate;
-  final String         marketSummary;
-  final String         rulesSummary;
-  final List<String>   settlementSources;
-  final String         fullRulesDocUrl;
-  final double         totalPoolInUsd;
-  final bool           isLiveSports;
+  final DateTime?       listDate;
+  final String          marketSummary;
+  final String          rulesSummary;
+  final List<String>    settlementSources;
+  final String          fullRulesDocUrl;
+  final double          totalPoolInUsd;
+  final bool            isLiveSports;
   final List<EventRegion> regions;
-  final DateTime?      createdAt;
-  final DateTime?      updatedAt;
+  final DateTime?       createdAt;
+  final DateTime?       updatedAt;
 
   EventModel({
     required this.id,
@@ -163,6 +163,37 @@ class EventModel {
   });
 
   factory EventModel.fromJson(Map<String, dynamic> json) {
+    // ── Parse sub_markets / markets ────────────────────────────────────────
+    // The API may return markets as:
+    //   1. A Map<String, dynamic> keyed by market _id  ← actual API shape
+    //   2. A List<dynamic>                             ← fallback / future
+    List<SubMarket> parseMarkets(dynamic raw) {
+      if (raw == null) return [];
+
+      if (raw is Map) {
+        // Shape: { "marketId": { ...marketFields }, ... }
+        return raw.values
+            .whereType<Map<String, dynamic>>()
+            .map((m) => SubMarket.fromJson(m))
+            .toList();
+      }
+
+      if (raw is List) {
+        // Shape: [ { ...marketFields }, ... ]
+        return raw
+            .whereType<Map<String, dynamic>>()
+            .map((m) => SubMarket.fromJson(m))
+            .toList();
+      }
+
+      return [];
+    }
+
+    // The list-events endpoint uses "markets"; the single-event endpoint may
+    // use "sub_markets" — handle both keys gracefully.
+    final marketsRaw =
+        json['markets'] ?? json['sub_markets'];
+
     return EventModel(
       id:            json['_id']           ?? '',
       eventTitle:    json['event_title']   ?? '',
@@ -170,9 +201,7 @@ class EventModel {
       category:      json['category']      ?? '',
       subCategory:   json['sub_category']  ?? '',
       hasSubMarkets: json['has_sub_markets'] ?? false,
-      subMarkets:    (json['sub_markets'] as List<dynamic>? ?? [])
-          .map((e) => SubMarket.fromJson(e as Map<String, dynamic>))
-          .toList(),
+      subMarkets:    parseMarkets(marketsRaw),
       listDate:      _parseDate(json['list_date']),
       marketSummary: json['market_summary'] ?? '',
       rulesSummary:  json['rules_summary']  ?? '',
@@ -182,9 +211,9 @@ class EventModel {
       fullRulesDocUrl: json['full_rules_doc_url'] ?? '',
       totalPoolInUsd:  (json['total_pool_in_usd'] as num?)?.toDouble() ?? 0,
       isLiveSports:    json['is_live_sports'] ?? false,
-      regions:         (json['regions'] as List<dynamic>? ?? [])
-          .map((e) => EventRegion.fromJson(e as Map<String, dynamic>))
-          .toList(),
+      // regions field is a list of IDs (strings) on the list endpoint,
+      // but could be populated objects on the single-event endpoint.
+      regions: _parseRegions(json['regions']),
       createdAt: _parseDate(json['createdAt']),
       updatedAt: _parseDate(json['updatedAt']),
     );
@@ -195,6 +224,17 @@ class EventModel {
 
   /// True if at least one sub-market is open
   bool get isOpen => subMarkets.any((m) => m.isOpen);
+}
+
+/// Handles regions as either a list of populated objects OR a list of ID strings.
+List<EventRegion> _parseRegions(dynamic raw) {
+  if (raw == null) return [];
+  if (raw is! List) return [];
+  return raw.map((r) {
+    if (r is Map<String, dynamic>) return EventRegion.fromJson(r);
+    // raw string ID — create a minimal placeholder
+    return EventRegion(id: r.toString(), name: '', code: '');
+  }).toList();
 }
 
 // ── Pagination ────────────────────────────────────────────────────
@@ -211,14 +251,23 @@ class PaginationModel {
 
   factory PaginationModel.fromJson(Map<String, dynamic> json) {
     return PaginationModel(
-      total:       json['total']       ?? 0,
-      currentPage: json['currentPage'] ?? 1,
-      totalPages:  json['totalPages']  ?? 1,
+      total:       (json['total'] as num?)?.toInt() ?? 0,
+      currentPage: (json['currentPage'] as num?)?.toInt() ?? 1,
+      totalPages:  (json['totalPages'] as num?)?.toInt() ?? 1,
     );
   }
 }
 
 // ── API Response Wrapper ──────────────────────────────────────────
+// The /api/events endpoint returns:
+// {
+//   "success": true,
+//   "events": {                         ← MAP, not array
+//     "<_id>": { ...eventFields },
+//     ...
+//   },
+//   "pagination": { "total": 11 }
+// }
 class EventsResponseModel {
   final bool               success;
   final List<EventModel>   events;
@@ -231,19 +280,41 @@ class EventsResponseModel {
   });
 
   factory EventsResponseModel.fromJson(Map<String, dynamic> json) {
+    // events can be a Map<id, eventObj> OR a List — handle both
+    List<EventModel> parseEvents(dynamic raw) {
+      if (raw == null) return [];
+
+      if (raw is Map) {
+        // Actual API shape: { "<_id>": { ...fields }, ... }
+        return raw.values
+            .whereType<Map<String, dynamic>>()
+            .map((e) => EventModel.fromJson(e))
+            .toList();
+      }
+
+      if (raw is List) {
+        return raw
+            .whereType<Map<String, dynamic>>()
+            .map((e) => EventModel.fromJson(e))
+            .toList();
+      }
+
+      return [];
+    }
+
     return EventsResponseModel(
-      success: json['success'] ?? false,
-      events:  (json['events'] as List<dynamic>? ?? [])
-          .map((e) => EventModel.fromJson(e as Map<String, dynamic>))
-          .toList(),
+      success:    json['success'] ?? false,
+      events:     parseEvents(json['events']),
       pagination: json['pagination'] != null
-          ? PaginationModel.fromJson(json['pagination'])
+          ? PaginationModel.fromJson(json['pagination'] as Map<String, dynamic>)
           : null,
     );
   }
 }
 
 // ── Single Event Response ─────────────────────────────────────────
+// Shape from /api/events/:id may wrap the event under an "event" key
+// OR return it at the top level — handle both.
 class EventSingleResponseModel {
   final bool        success;
   final EventModel? event;
@@ -251,11 +322,19 @@ class EventSingleResponseModel {
   EventSingleResponseModel({required this.success, this.event});
 
   factory EventSingleResponseModel.fromJson(Map<String, dynamic> json) {
+    final rawEvent = json['event'] ?? json['data'];
+
+    EventModel? parsed;
+    if (rawEvent is Map<String, dynamic>) {
+      parsed = EventModel.fromJson(rawEvent);
+    } else if (json['_id'] != null) {
+      // top-level IS the event
+      parsed = EventModel.fromJson(json);
+    }
+
     return EventSingleResponseModel(
-      success: json['success'] ?? false,
-      event:   json['event'] != null
-          ? EventModel.fromJson(json['event'] as Map<String, dynamic>)
-          : null,
+      success: json['success'] ?? parsed != null,
+      event:   parsed,
     );
   }
 }

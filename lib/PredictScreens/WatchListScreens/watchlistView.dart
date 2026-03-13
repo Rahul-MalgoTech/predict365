@@ -1,104 +1,156 @@
+// lib/PredictScreens/WatchlistScreen/WatchlistScreen.dart
+
 import 'package:flutter/material.dart';
+import 'package:predict365/Models/EventModel.dart';
+import 'package:predict365/PredictScreens/PredictionDetailScreens/predictionDetailView.dart';
 import 'package:predict365/Predict_Utils/App_Theme/App_Theme.dart';
 import 'package:predict365/Reusable_Widgets/AppText_Theme/AppText_Theme.dart';
+import 'package:predict365/Reusable_Widgets/BondingNavigator.dart';
+import 'package:predict365/Reusable_Widgets/ReuseableGradientContainer/ReusableGradientContainer.dart';
+import 'package:predict365/Reusable_Widgets/ShimmerLoaderWidget/ShimmerWidget.dart';
+import 'package:predict365/ViewModel/BookmarkVM.dart';
+import 'package:predict365/ViewModel/WatchlistVM.dart';
 import 'package:provider/provider.dart';
 
-class WatchlistScreen extends StatefulWidget {
+class WatchlistScreen extends StatelessWidget {
   const WatchlistScreen({super.key});
 
   @override
-  State<WatchlistScreen> createState() => _WatchlistScreenState();
+  Widget build(BuildContext context) {
+    return ChangeNotifierProvider(
+      create: (ctx) => WatchlistViewModel()..fetchBookmarks(seeder: ctx.read<BookmarkViewModel>()),
+      child: const _WatchlistBody(),
+    );
+  }
 }
 
-class _WatchlistScreenState extends State<WatchlistScreen> {
-  final List<Map<String, dynamic>> _events = [
-    {
-      'flag': 'assets/images/india.png',
-      'title': 'Will Assam legislative Assembly election polling ?',
-      'percent': '60%',
-      'yesLabel': 'SA',
-      'yesOdds': '₹6.0',
-      'noLabel': 'NZ',
-      'noOdds': '₹4.0',
-      'vol': '₹82.34L Vol',
-      'isLive': true,
-      'isFav': true,
-    },
-    {
-      'flag': 'assets/images/india.png',
-      'title': 'Will Assam legislative Assembly election polling ?',
-      'percent': '60%',
-      'yesLabel': 'SA',
-      'yesOdds': '₹6.0',
-      'noLabel': 'NZ',
-      'noOdds': '₹4.0',
-      'vol': '₹82.34L Vol',
-      'isLive': false,
-      'isFav': true,
-    },
-  ];
+class _WatchlistBody extends StatelessWidget {
+  const _WatchlistBody();
 
   @override
   Widget build(BuildContext context) {
     final isDark = context.watch<ThemeController>().isDarkMode;
-    final sw     = MediaQuery.of(context).size.width;
-    final bg     = isDark ? const Color(0xFF1C1C1E) : Colors.white;
-    final txt    = isDark ? Colors.white : Colors.black87;
-    final div    = isDark ? Colors.grey.shade800 : Colors.grey.shade200;
 
     return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor.withOpacity(0.99),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: Column(
           children: [
-            // ── Top bar ──
-            Container(
-
-              padding: EdgeInsets.symmetric(
-                horizontal: sw * 0.04,
-                vertical: sw * 0.035,
-              ),
+            // ── Top bar ─────────────────────────────────────────
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
               child: Row(
                 children: [
                   GestureDetector(
                     onTap: () => Navigator.pop(context),
-                    child: Icon(Icons.arrow_back, color: txt, size: sw * 0.06),
+                    child: Icon(Icons.arrow_back_ios,
+                        color: Theme.of(context).iconTheme.color, size: 20),
                   ),
-                  Expanded(
+                  const Expanded(
                     child: Center(
-                      child: AppText(
+                      child: Text(
                         'Watchlist',
-
-                        fontSize: sw * 0.045,
-                        fontWeight: FontWeight.w500,
-                        color: txt,
-
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
+                        ),
                       ),
                     ),
                   ),
-                  SizedBox(width: sw * 0.06),
+                  // Placeholder to keep title centred
+                  const SizedBox(width: 20),
                 ],
               ),
             ),
-            Divider(height: 1, thickness: 1, color: div),
 
-            // ── Cards list ──
+            Divider(
+                color: Theme.of(context).dividerColor,
+                height: 1, thickness: 1),
+
+            // ── Body ─────────────────────────────────────────────
             Expanded(
-              child: ListView.separated(
-                padding: EdgeInsets.symmetric(
-                  horizontal: sw * 0.04,
-                  vertical: sw * 0.04,
-                ),
-                itemCount: _events.length,
-                separatorBuilder: (_, __) => SizedBox(height: sw * 0.04),
-                itemBuilder: (context, i) => _EventCard(
-                  event: _events[i],
-                  sw: sw,
-                  isDark: isDark,
-                  onFavToggle: () => setState(() {
-                    _events[i]['isFav'] = !(_events[i]['isFav'] as bool);
-                  }),
-                ),
+              child: Consumer<WatchlistViewModel>(
+                builder: (context, vm, _) {
+                  if (vm.isLoading) return const _WatchlistSkeleton();
+
+                  if (vm.status == WatchlistStatus.error) {
+                    return Center(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.error_outline,
+                              size: 48, color: Colors.grey.shade500),
+                          const SizedBox(height: 12),
+                          Text(vm.error,
+                              style: TextStyle(
+                                  color: Colors.grey.shade500, fontSize: 14)),
+                          const SizedBox(height: 16),
+                          GestureDetector(
+                            onTap: vm.refresh,
+                            child: GradientContainer(
+                              child: const Padding(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 20, vertical: 9),
+                                child: Text('Retry',
+                                    style: TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w600)),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+
+                  if (vm.isEmpty) {
+                    return Center(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(20),
+                            decoration: BoxDecoration(
+                              color: Colors.grey.shade800.withValues(alpha: 0.4),
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(Icons.bookmark_border,
+                                size: 40, color: Colors.grey.shade500),
+                          ),
+                          const SizedBox(height: 16),
+                          Text('No bookmarks yet',
+                              style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.grey.shade300)),
+                          const SizedBox(height: 6),
+                          Text(
+                            'Tap the ★ icon on any event to\nadd it to your watchlist.',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                                fontSize: 13, color: Colors.grey.shade500),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+
+                  return RefreshIndicator(
+                    onRefresh: () => vm.refresh(seeder: context.read<BookmarkViewModel>()),
+                    color: const Color(0xFFF5A623),
+                    backgroundColor: Theme.of(context).primaryColorDark,
+                    child: ListView.separated(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 16),
+                      itemCount: vm.events.length,
+                      separatorBuilder: (_, __) =>
+                      const SizedBox(height: 12),
+                      itemBuilder: (context, i) =>
+                          _WatchlistCard(event: vm.events[i]),
+                    ),
+                  );
+                },
               ),
             ),
           ],
@@ -108,172 +160,310 @@ class _WatchlistScreenState extends State<WatchlistScreen> {
   }
 }
 
-// ── Event Card ───────────────────────────────────────────────────
-class _EventCard extends StatelessWidget {
-  final Map<String, dynamic> event;
-  final double sw;
-  final bool isDark;
-  final VoidCallback onFavToggle;
-
-  const _EventCard({
-    required this.event,
-    required this.sw,
-    required this.isDark,
-    required this.onFavToggle,
-  });
+// ─────────────────────────────────────────────────────────────────
+// WATCHLIST CARD — matches existing app card style
+// ─────────────────────────────────────────────────────────────────
+class _WatchlistCard extends StatelessWidget {
+  final EventModel event;
+  const _WatchlistCard({required this.event});
 
   @override
   Widget build(BuildContext context) {
-    final txt    = isDark ? Colors.white : Colors.black87;
-    final sub    = isDark ? Colors.grey.shade400 : Colors.grey.shade600;
-    final div    = isDark ? Colors.grey.shade700 : Colors.grey.shade200;
-    final isLive = event['isLive'] as bool;
-    final isFav  = event['isFav'] as bool;
+    final m         = event.primaryMarket;
+    final isOpen    = m?.isOpen ?? false;
+    final isLive    = event.isLiveSports;
 
-    return Container(
-      decoration: BoxDecoration(
-        color: Theme.of(context).primaryColorDark,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: div),
-      ),
-      padding: EdgeInsets.all(sw * 0.04),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
+    // YES price: lastTradedSide1Price as percentage, fallback to 50
+    final yesPrice  = m?.lastTradedSide1Price != null
+        ? '${(m!.lastTradedSide1Price! * 100).toStringAsFixed(0)}¢'
+        : '50¢';
+    final noPrice   = m?.lastTradedSide1Price != null
+        ? '${((1 - m!.lastTradedSide1Price!) * 100).toStringAsFixed(0)}¢'
+        : '50¢';
 
-          // ── flag + title + percent ──
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              ClipOval(
-                child: Image.asset(
-                  event['flag'] as String,
-                  width: sw * 0.1,
-                  height: sw * 0.1,
-                  fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) => Container(
-                    width: sw * 0.1, height: sw * 0.1,
-                    decoration: BoxDecoration(
-                      color: isDark ? Colors.grey.shade700 : Colors.grey.shade200,
-                      shape: BoxShape.circle,
-                    ),
-                    child: Icon(Icons.flag, size: sw * 0.05, color: Colors.grey),
+    return GestureDetector(
+      onTap: () => predictNavigator.newPage(
+          context, page: PredikDetailScreen(eventId: event.id)),
+      child: Container(
+        decoration: BoxDecoration(
+          color: Theme.of(context).primaryColorDark,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: Theme.of(context).dividerColor),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.06),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        padding: const EdgeInsets.all(14),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+
+            // ── Image + Title + Bookmark star ────────────────
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Event image
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: event.eventImage.isNotEmpty
+                      ? Image.network(
+                    event.eventImage,
+                    width: 44, height: 44,
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, __, ___) =>
+                        _imageFallback(context),
+                  )
+                      : _imageFallback(context),
+                ),
+                const SizedBox(width: 12),
+
+                // Title
+                Expanded(
+                  child: AppText(
+                    event.eventTitle,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
-              ),
-              SizedBox(width: sw * 0.03),
-              Expanded(
-                child: AppText(
-                  maxLines: 2,
-                  event['title'] as String,
+                const SizedBox(width: 8),
 
-                  fontSize: 15,
-                  fontWeight: FontWeight.w500,
-                  color: txt,
-
-
-                ),
-              ),
-              SizedBox(width: sw * 0.02),
-              AppText(
-                event['percent'] as String,
-
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-                color: txt,
-
-              ),
-            ],
-          ),
-
-          SizedBox(height: sw * 0.035),
-
-          // ── SA | NZ buttons ──
-          Row(
-            children: [
-              Expanded(
-                child: GestureDetector(
-                  onTap: () {},
-                  child: Container(
-                    padding: EdgeInsets.symmetric(vertical: sw * 0.028),
-                    decoration: BoxDecoration(
-                      color: Colors.green.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Center(
-                      child: Text(
-                        '${event['yesLabel']}${event['yesOdds']}',
-                        style: TextStyle(
-                          fontSize: sw * 0.037,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.green,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              SizedBox(width: sw * 0.03),
-              Expanded(
-                child: GestureDetector(
-                  onTap: () {},
-                  child: Container(
-                    padding: EdgeInsets.symmetric(vertical: sw * 0.028),
-                    decoration: BoxDecoration(
-                      color: Colors.red.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Center(
-                      child: Text(
-                        '${event['noLabel']}${event['noOdds']}',
-                        style: TextStyle(
-                          fontSize: sw * 0.037,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.red,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-
-          SizedBox(height: sw * 0.03),
-
-          // ── LIVE badge + vol + heart ──
-          Row(
-            children: [
-              if (isLive) ...[
-                Icon(Icons.podcasts, size: sw * 0.04, color: Colors.red),
-                SizedBox(width: sw * 0.015),
-                Text(
-                  'LIVE',
-                  style: TextStyle(
-                    fontSize: sw * 0.03,
-                    fontWeight: FontWeight.w700,
-                    color: Colors.red,
-                    letterSpacing: 0.5,
-                  ),
-                ),
-                SizedBox(width: sw * 0.02),
+                // ★ Bookmark star — tapping removes from watchlist
+                _WatchlistStar(event: event),
               ],
-              Text(
-                event['vol'] as String,
-                style: TextStyle(fontSize: sw * 0.03, color: sub),
-              ),
-              const Spacer(),
-              GestureDetector(
-                onTap: onFavToggle,
-                child: Icon(
-                  isFav ? Icons.favorite : Icons.favorite_border,
-                  size: sw * 0.055,
-                  color: isFav ? Colors.red : sub,
+            ),
+
+            const SizedBox(height: 14),
+
+            // ── YES / NO bet buttons ──────────────────────────
+            Row(
+              children: [
+                Expanded(
+                    child: _betButton(
+                        context,
+                        m?.side1 ?? 'Yes',
+                        yesPrice,
+                        Colors.green)),
+                const SizedBox(width: 10),
+                Expanded(
+                    child: _betButton(
+                        context,
+                        m?.side2 ?? 'No',
+                        noPrice,
+                        Colors.red)),
+              ],
+            ),
+
+            const SizedBox(height: 12),
+
+            // ── Footer: LIVE badge + volume + market count ────
+            Row(
+              children: [
+                if (isLive) ...[
+                  const Icon(Icons.podcasts, size: 14, color: Colors.red),
+                  const SizedBox(width: 4),
+                  const Text('LIVE',
+                      style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.red,
+                          letterSpacing: 0.5)),
+                  const SizedBox(width: 8),
+                ],
+                if (!isOpen)
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 6, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: Colors.red.withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: const Text('CLOSED',
+                        style: TextStyle(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.red)),
+                  ),
+                if (isOpen)
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 6, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: Colors.green.withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: const Text('OPEN',
+                        style: TextStyle(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.green)),
+                  ),
+                const SizedBox(width: 8),
+                Text(
+                  '\$${event.totalPoolInUsd.toStringAsFixed(0)} Vol',
+                  style: TextStyle(
+                      fontSize: 12, color: Colors.grey.shade500),
                 ),
-              ),
-            ],
+                const Spacer(),
+                Text(
+                  '${event.subMarkets.length} Market${event.subMarkets.length == 1 ? '' : 's'}',
+                  style: TextStyle(
+                      fontSize: 12, color: Colors.grey.shade500),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _imageFallback(BuildContext context) => Container(
+    width: 44, height: 44,
+    decoration: BoxDecoration(
+      color: Theme.of(context).dividerColor,
+      borderRadius: BorderRadius.circular(8),
+    ),
+    child: Icon(Icons.event, color: Colors.grey.shade400, size: 20),
+  );
+
+  Widget _betButton(
+      BuildContext context, String label, String price, Color color) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 10),
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Text(
+        '$label  $price',
+        style: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+            color: color),
+      ),
+    );
+  }
+}
+
+// ── Bookmark star — gold when bookmarked, removes on toggle ──────
+class _WatchlistStar extends StatelessWidget {
+  final EventModel event;
+  const _WatchlistStar({required this.event});
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<BookmarkViewModel>(
+      builder: (context, bVm, _) {
+        final bookmarked = bVm.isBookmarked(event.id);
+        final pending    = bVm.isPending(event.id);
+
+        return GestureDetector(
+          onTap: pending
+              ? null
+              : () async {
+            await bVm.toggleBookmark(event.id);
+            // After toggling off, remove from watchlist UI
+            if (!bVm.isBookmarked(event.id)) {
+              context.read<WatchlistViewModel>().removeEvent(event.id);
+            }
+          },
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            padding: const EdgeInsets.all(6),
+            decoration: BoxDecoration(
+              color: bookmarked
+                  ? const Color(0xFFF5A623).withValues(alpha: 0.15)
+                  : Colors.grey.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: pending
+                ? SizedBox(
+              width: 16, height: 16,
+              child: CircularProgressIndicator(
+                  strokeWidth: 1.5,
+                  color: Colors.grey.shade500),
+            )
+                : Icon(
+              bookmarked ? Icons.star : Icons.star_border,
+              size: 16,
+              color: bookmarked
+                  ? const Color(0xFFF5A623)
+                  : Colors.grey,
+            ),
           ),
-        ],
+        );
+      },
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────
+// SHIMMER SKELETON
+// ─────────────────────────────────────────────────────────────────
+class _WatchlistSkeleton extends StatelessWidget {
+  const _WatchlistSkeleton();
+
+  @override
+  Widget build(BuildContext context) {
+    return ShimmerWidget(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        child: Column(
+          children: List.generate(4, (_) => Padding(
+            padding: const EdgeInsets.only(bottom: 12),
+            child: Container(
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                color: Theme.of(context).primaryColorDark,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Theme.of(context).dividerColor),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      ShimmerBox(width: 44, height: 44, radius: 8),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            ShimmerBox(width: double.infinity, height: 14),
+                            const SizedBox(height: 6),
+                            ShimmerBox(width: 200, height: 14),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      ShimmerBox(width: 28, height: 28, radius: 8),
+                    ],
+                  ),
+                  const SizedBox(height: 14),
+                  Row(children: [
+                    Expanded(child: ShimmerBox(width: double.infinity, height: 38, radius: 8)),
+                    const SizedBox(width: 10),
+                    Expanded(child: ShimmerBox(width: double.infinity, height: 38, radius: 8)),
+                  ]),
+                  const SizedBox(height: 12),
+                  Row(children: [
+                    ShimmerBox(width: 80, height: 12),
+                    const Spacer(),
+                    ShimmerBox(width: 60, height: 12),
+                  ]),
+                ],
+              ),
+            ),
+          )),
+        ),
       ),
     );
   }

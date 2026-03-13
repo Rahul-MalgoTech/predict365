@@ -188,9 +188,12 @@ class NetworkApiService extends BaseApiService {
 
   @override
   Future postResponse(String url, {Map<String, dynamic>? body}) async {
+    final String? token = await AuthStorage.instance.getToken();
+
     dynamic responseJson;
     var data = json.encode(body);
     var headers = {
+      "Authorization": "Bearer $token",
       "content-type": "application/json",
       "Accept": "application/json",
     };
