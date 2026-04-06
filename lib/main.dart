@@ -2,11 +2,13 @@
 
 import 'package:flutter/material.dart';
 import 'package:predict365/AuthStorage/authStorage.dart';
+import 'package:predict365/PredictScreens/HomeScreens/MarketTickData.dart';
 
 import 'package:predict365/PredictScreens/LoginScreens/LoginView.dart';
 import 'package:predict365/Predict_Utils/App_Theme/App_Theme.dart';
 import 'package:predict365/Predict_Utils/ColorHandlers/Apptheme.dart';
 import 'package:predict365/ViewModel/BookmarkVM.dart';
+import 'package:predict365/ViewModel/CancelOrderVM.dart';
 import 'package:predict365/ViewModel/CategoryVM.dart';
 import 'package:predict365/ViewModel/EventVM.dart';
 import 'package:predict365/ViewModel/MarketChartVM.dart';
@@ -37,6 +39,15 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => UserViewModel()),
         ChangeNotifierProvider(create: (_) => MarketDataViewModel()),
         ChangeNotifierProvider(create: (_) => BookmarkViewModel()),
+        ChangeNotifierProvider(create: (_) => MarketTickerService()),
+        ChangeNotifierProvider(create: (_) => CancelOrderViewModel()),
+
+
+
+
+
+
+
 
 
 

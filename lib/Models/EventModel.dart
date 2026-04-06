@@ -96,8 +96,8 @@ class SubMarket {
       disputeCount:         (json['dispute_count'] as num?)?.toInt() ?? 0,
       bondAmount:           (json['bond_amount'] as num?)?.toDouble() ?? 0,
       resolutionWindow:     (json['resolution_window'] as num?)?.toInt() ?? 0,
-      side1:                json['side_1'] ?? 'Yes',
-      side2:                json['side_2'] ?? 'No',
+      side1:                json['side_1'] ?? '',
+      side2:                json['side_2'] ?? '',
       lastTradedSide1Price: (json['lastTradedSide1Price'] as num?)?.toDouble(),
       marketPrices:         MarketPrices.fromJson(json['marketPrices'] ?? {}),
     );
@@ -141,6 +141,8 @@ class EventModel {
   final List<EventRegion> regions;
   final DateTime?       createdAt;
   final DateTime?       updatedAt;
+  final String          eventType;   // e.g. "continuous" | "normal" | ""
+  final String          cryptoSymbol; // e.g. "USDJPY", "BTCUSDT" — parsed from title/summary
 
   EventModel({
     required this.id,
@@ -160,7 +162,54 @@ class EventModel {
     required this.regions,
     this.createdAt,
     this.updatedAt,
+    this.eventType   = '',
+    this.cryptoSymbol = '',
   });
+
+  /// True when this is a continuous (live crypto/forex) event
+  bool get isContinuous => eventType.toLowerCase() == 'continuous';
+
+  /// Finance markets: forex, stocks, indices, commodities, treasuries
+  bool get isFinanceMarket {
+    final src = (category + subCategory).toLowerCase();
+    return src.contains('finance')   ||
+        src.contains('stock')     ||
+        src.contains('indice')    ||
+        src.contains('commodit')  ||
+        src.contains('forex')     ||
+        src.contains('treasur')   ||
+        src.contains('earning');
+  }
+
+  /// Crypto markets: bitcoin, eth, etc.
+  bool get isCryptoMarket {
+    final src = (category + subCategory).toLowerCase();
+    return src.contains('crypto');
+  }
+
+  /// Which chart to show:
+  ///   'finance' → LiveFinanceChart (staging WS)
+  ///   'crypto'  → LiveCryptoChart  (Binance WS)
+  ///   'normal'  → PriceLineChart   (API candles)
+  ///
+  /// NOTE: category/subCategory are IDs from the API, not human-readable strings.
+  /// Routing is based on eventType + cryptoSymbol content:
+  ///   - continuous + symbol ends USDT/BTC/ETH/BNB → 'crypto' (Binance)
+  ///   - continuous + forex/index symbol            → 'finance' (staging WS)
+  ///   - not continuous                             → 'normal'
+  String get chartType {
+    if (!isContinuous) return 'normal';
+    final sym = cryptoSymbol.toUpperCase().trim();
+    if (sym.isEmpty) return 'finance';
+    // Crypto: ends in USDT, BTC, ETH, BNB — Binance pairs
+    if (sym.endsWith('USDT') || sym.endsWith('BTC') ||
+        sym.endsWith('ETH')  || sym.endsWith('BNB')) {
+      return 'crypto';
+    }
+    // Finance: forex, indices (USDJPY, XAUUSD, SPX, NDX, DJI, GC=F, etc.)
+    return 'finance';
+  }
+
 
   factory EventModel.fromJson(Map<String, dynamic> json) {
     // ── Parse sub_markets / markets ────────────────────────────────────────
@@ -211,6 +260,9 @@ class EventModel {
       fullRulesDocUrl: json['full_rules_doc_url'] ?? '',
       totalPoolInUsd:  (json['total_pool_in_usd'] as num?)?.toDouble() ?? 0,
       isLiveSports:    json['is_live_sports'] ?? false,
+      eventType:       json['event_type']    ?? '',
+      // API returns the trading symbol as 'symbol_name' (e.g. "BTCUSDT", "ETHUSD", "USDJPY")
+      cryptoSymbol:    json['symbol_name'] ?? json['crypto_symbol'] ?? json['symbol'] ?? '',
       // regions field is a list of IDs (strings) on the list endpoint,
       // but could be populated objects on the single-event endpoint.
       regions: _parseRegions(json['regions']),
@@ -224,6 +276,42 @@ class EventModel {
 
   /// True if at least one sub-market is open
   bool get isOpen => subMarkets.any((m) => m.isOpen);
+
+  // ── Smart side label helpers ──────────────────────────────────
+  // For continuous/crypto/finance events, the API sometimes omits side_1/side_2.
+  // Infer from event title: "Up or Down", "Higher or Lower", etc.
+  // Fallback chain: sub-market side_1 → title analysis → 'Yes'
+
+  String get side1Label {
+    // If sub-market has a non-empty side1 use it
+    final raw = primaryMarket?.side1 ?? '';
+    if (raw.isNotEmpty) return raw;
+    return _inferSide1();
+  }
+
+  String get side2Label {
+    final raw = primaryMarket?.side2 ?? '';
+    if (raw.isNotEmpty) return raw;
+    return _inferSide2();
+  }
+
+  String _inferSide1() {
+    final t = eventTitle.toLowerCase();
+    if (t.contains('up or down')  || t.contains('higher or lower')) return 'Up';
+    if (t.contains('above')       || t.contains('exceed'))          return 'Yes';
+    if (t.contains('will ')       && isContinuous)                  return 'Up';
+    if (isContinuous)                                                return 'Up';
+    return 'Yes';
+  }
+
+  String _inferSide2() {
+    final t = eventTitle.toLowerCase();
+    if (t.contains('up or down')  || t.contains('higher or lower')) return 'Down';
+    if (t.contains('above')       || t.contains('exceed'))          return 'No';
+    if (t.contains('will ')       && isContinuous)                  return 'Down';
+    if (isContinuous)                                                return 'Down';
+    return 'No';
+  }
 }
 
 /// Handles regions as either a list of populated objects OR a list of ID strings.

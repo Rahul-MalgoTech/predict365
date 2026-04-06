@@ -226,7 +226,7 @@ class _ToastWidgetState extends State<_ToastWidget>
     final sw = MediaQuery.of(context).size.width;
 
     return Positioned(
-      top: MediaQuery.of(context).padding.top + 12,
+      bottom: MediaQuery.of(context).padding.bottom + 24,
       left: 16,
       right: 16,
       child: Material(
@@ -237,7 +237,7 @@ class _ToastWidgetState extends State<_ToastWidget>
             opacity: _fade,
             child: SlideTransition(
               position: Tween<Offset>(
-                begin: const Offset(0, -1),
+                begin: const Offset(0, 1),
                 end: Offset.zero,
               ).animate(CurvedAnimation(
                 parent: _ctrl,

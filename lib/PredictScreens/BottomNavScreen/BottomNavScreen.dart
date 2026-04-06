@@ -23,7 +23,7 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
     const RankingScreen(),
     const ReferEarnScreen(),
     const PortfolioScreen(),
-    const ProfileScreen(),
+    const ProfileScreen(nav: false,),
   ];
 
   @override

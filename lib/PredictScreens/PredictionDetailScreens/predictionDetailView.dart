@@ -8,6 +8,8 @@ import 'package:predict365/PredictScreens/PredictionDetailScreens/ActivityTab/Ac
 import 'package:predict365/PredictScreens/PredictionDetailScreens/BuyScreens/BuyDrawerView.dart';
 import 'package:predict365/PredictScreens/PredictionDetailScreens/BuyScreens/OrderBookService.dart';
 import 'package:predict365/PredictScreens/PredictionDetailScreens/Chart/PriceLineChart.dart';
+import 'package:predict365/PredictScreens/PredictionDetailScreens/Chart/LiveCryptoChart.dart';
+import 'package:predict365/PredictScreens/PredictionDetailScreens/Chart/LiveFinanceChart.dart';
 import 'package:predict365/PredictScreens/PredictionDetailScreens/CommentTab/CommentTabView.dart';
 import 'package:predict365/Predict_Utils/App_Theme/App_Theme.dart';
 import 'package:predict365/Predict_Utils/ColorHandlers/AppColors.dart';
@@ -18,6 +20,7 @@ import 'package:predict365/Reusable_Widgets/ShimmerLoaderWidget/ShimmerWidget.da
 import 'package:predict365/ViewModel/EventDetailVM.dart';
 import 'package:predict365/ViewModel/MarketChartVM.dart';
 import 'package:predict365/ViewModel/ActivityVM.dart';
+import 'package:predict365/ViewModel/BookmarkVM.dart';
 import 'package:predict365/ViewModel/ThoughtsVM.dart';
 import 'package:predict365/ViewModel/UserVM.dart';
 import 'package:provider/provider.dart';
@@ -157,13 +160,14 @@ class _DetailBodyState extends State<_DetailBody> {
                             ),
                           ),
 
-                          // ── Tab bar — sticks to top when scrolled ─────
                           SliverPersistentHeader(
                             pinned: true,
                             delegate: _PinnedTabBarDelegate(
                               backgroundColor:
-                              Theme.of(context).scaffoldBackgroundColor.withOpacity(0.99),
-                              child: _buildTabBar(context),
+                              Theme.of(context).scaffoldBackgroundColor,
+                              child: _buildTabBar(context,
+                                  backgroundColor: Theme.of(context)
+                                      .scaffoldBackgroundColor),
                             ),
                           ),
 
@@ -264,7 +268,7 @@ class _DetailBodyState extends State<_DetailBody> {
         children: [
           AppText(vol, fontSize: 16, fontWeight: FontWeight.w500),
           const Spacer(),
-          Icon(Icons.favorite_border, size: 20, color: Colors.grey.shade500),
+          _DetailBookmarkStar(eventId: event.id),
         ],
       ),
     );
@@ -316,35 +320,8 @@ class _DetailBodyState extends State<_DetailBody> {
 
           const SizedBox(height: 14),
 
-          Consumer<MarketDataViewModel>(
-            builder: (context, chartVm, _) {
-              if (chartVm.isLoading) {
-                return PriceLineChartSkeleton(height: 200);
-              }
-              if (chartVm.status == MarketDataStatus.error) {
-                return Container(
-                  width: double.infinity, height: 200,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF0F1419),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Center(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(Icons.show_chart, size: 32, color: Colors.grey.shade700),
-                        const SizedBox(height: 8),
-                        Text('No chart data',
-                            style: TextStyle(color: Colors.grey.shade600, fontSize: 12)),
-                      ],
-                    ),
-                  ),
-                );
-              }
-              final candles = chartVm.data?.allCandles ?? [];
-              return PriceLineChart(candles: candles, height: 200);
-            },
-          ),
+          // ── Chart: 3 types based on event category + eventType ────
+          _buildChart(event),
         ],
       ),
     );
@@ -404,6 +381,107 @@ class _DetailBodyState extends State<_DetailBody> {
   // ── BETTING OPTIONS ───────────────────────────────────────────
   Widget _buildBettingOptions(BuildContext context, EventModel event) {
     if (event.subMarkets.isEmpty) return const SizedBox.shrink();
+
+    // Detect time-slot events: same name OR >10 sub-markets (e.g. 276x "Bitcoin 15 min").
+    final uniqueNames = event.subMarkets.map((m) => m.name.trim().toLowerCase()).toSet();
+    final isTimeSlotEvent = uniqueNames.length == 1 || event.subMarkets.length > 10;
+    debugPrint('=== subMarkets=${event.subMarkets.length} uniqueNames=${uniqueNames.length} isTimeSlot=$isTimeSlotEvent');
+
+    if (isTimeSlotEvent) {
+      // For time-slot markets (e.g. "Bitcoin Up or Down - 15 min"),
+      // show only the LAST OPEN sub-market (most recent slot).
+      // If none are open, show the very last one.
+      final openMarkets = event.subMarkets.where((m) => m.isOpen).toList();
+      final m = openMarkets.isNotEmpty
+          ? openMarkets.last   // last = most recent open slot
+          : event.subMarkets.last;
+
+      // Only connect WS for this single market — disconnect any stale ones
+      final staleIds = _obServices.keys.where((id) => id != m.id).toList();
+      for (final id in staleIds) {
+        _obServices[id]?.dispose();
+        _obServices.remove(id);
+        _obBooks.remove(id);
+        _obLoading.remove(id);
+      }
+      _connectOrderBook(m);
+      final book    = _obBooks[m.id] ?? OrderBook.empty();
+      final loading = _obLoading[m.id] ?? true;
+
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            AppText(m.name,
+                fontSize: 16, fontWeight: FontWeight.w500,
+                maxLines: 2, overflow: TextOverflow.ellipsis),
+            const SizedBox(height: 4),
+            Row(children: [
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                decoration: BoxDecoration(
+                  color: m.isOpen
+                      ? Colors.green.withValues(alpha: 0.12)
+                      : Colors.red.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: AppText(
+                  m.isOpen ? 'OPEN' : 'CLOSED',
+                  fontSize: 11, fontWeight: FontWeight.w700,
+                  color: m.isOpen ? Colors.green : Colors.red,
+                ),
+              ),
+              if (event.regions.isNotEmpty) ...[
+                const SizedBox(width: 8),
+                AppText(event.regions.first.name, fontSize: 12, color: Colors.grey),
+              ],
+            ]),
+            const SizedBox(height: 10),
+            if (m.isOpen) ...[
+              Row(children: [
+                Expanded(child: GestureDetector(
+                  onTap: () => showBuySheet(context,
+                      subMarket: m, event: event, initialIsYes: true),
+                  child: _betBtn(m.side1, Colors.green, context),
+                )),
+                const SizedBox(width: 10),
+                Expanded(child: GestureDetector(
+                  onTap: () => showBuySheet(context,
+                      subMarket: m, event: event, initialIsYes: false),
+                  child: _betBtn(m.side2, Colors.red, context),
+                )),
+              ]),
+              const SizedBox(height: 14),
+              _DetailOrderBook(
+                  book: book, loading: loading,
+                  subMarket: m, event: event,
+                  lastEntryOnly: false),
+            ] else ...[
+              Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 5),
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Theme.of(context).dividerColor, width: 1.5),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Text(m.status.toUpperCase(),
+                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700,
+                          color: Colors.grey.shade400, letterSpacing: 0.5)),
+                ),
+              ]),
+              const SizedBox(height: 14),
+              _DetailOrderBook(
+                  book: book, loading: loading,
+                  subMarket: m, event: event,
+                  readOnly: true, lastEntryOnly: false),
+            ],
+          ],
+        ),
+      );
+    }
+
+    // ── Multi-market: different market names → show all with full order books ──
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -475,6 +553,7 @@ class _DetailBodyState extends State<_DetailBody> {
                   _DetailOrderBook(
                     book: book, loading: loading,
                     subMarket: m, event: event,
+                    // full order book
                   ),
                 ] else ...[
                   Row(mainAxisAlignment: MainAxisAlignment.end,
@@ -499,7 +578,9 @@ class _DetailBodyState extends State<_DetailBody> {
                   const SizedBox(height: 14),
                   _DetailOrderBook(
                     book: book, loading: loading,
-                    subMarket: m, event: event, readOnly: true,
+                    subMarket: m, event: event,
+                    readOnly: true,
+                    // full order book
                   ),
                 ],
               ],
@@ -584,6 +665,90 @@ class _DetailBodyState extends State<_DetailBody> {
     );
   }
 
+  // ── CHART — 3 types ───────────────────────────────────────────
+  Widget _buildChart(EventModel event) {
+    // Debug — remove after confirming
+    debugPrint('=== CHART DEBUG ===');
+    debugPrint('  eventType    : "${event.eventType}"');
+    debugPrint('  category     : "${event.category}"');
+    debugPrint('  subCategory  : "${event.subCategory}"');
+    debugPrint('  cryptoSymbol : "${event.cryptoSymbol}"');
+    debugPrint('  chartType    : "${event.chartType}"');
+    debugPrint('  isContinuous : ${event.isContinuous}');
+    debugPrint('  isFinance    : ${event.isFinanceMarket}');
+    debugPrint('  isCrypto     : ${event.isCryptoMarket}');
+
+    final sym = event.cryptoSymbol.isNotEmpty
+        ? event.cryptoSymbol
+        : _extractSymbol(event.eventTitle);
+
+    debugPrint('  resolved sym : "$sym"');
+
+    switch (event.chartType) {
+      case 'finance':
+        return LiveFinanceChart(symbol: sym, height: 200);
+      case 'crypto':
+        return LiveCryptoChart(symbol: sym, height: 200);
+      default:
+        return Consumer<MarketDataViewModel>(
+          builder: (context, chartVm, _) {
+            if (chartVm.isLoading) return PriceLineChartSkeleton(height: 200);
+            if (chartVm.status == MarketDataStatus.error) {
+              return Container(
+                width: double.infinity, height: 200,
+                decoration: BoxDecoration(
+                  color: const Color(0xFF0F1419),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Center(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.show_chart, size: 32, color: Colors.grey.shade700),
+                      const SizedBox(height: 8),
+                      Text('No chart data',
+                          style: TextStyle(color: Colors.grey.shade600, fontSize: 12)),
+                    ],
+                  ),
+                ),
+              );
+            }
+            final candles = chartVm.data?.allCandles ?? [];
+            return PriceLineChart(candles: candles, height: 200);
+          },
+        );
+    }
+  }
+
+  /// Extracts a trading symbol from the event title.
+  /// Returns the raw symbol — LiveFinanceChart adds =X suffix for Yahoo internally.
+  String _extractSymbol(String title) {
+    final upper = title.toUpperCase();
+    // Forex pairs — return raw pair, LiveFinanceChart converts to Yahoo format
+    const forexPairs = ['USDJPY', 'EURUSD', 'GBPUSD', 'USDCHF', 'AUDUSD',
+      'USDCAD', 'NZDUSD', 'USDINR', 'USDCNY', 'GBPJPY', 'EURJPY',
+      'EURGBP', 'AUDCAD', 'CADJPY', 'CHFJPY', 'NZDJPY'];
+    for (final pair in forexPairs) {
+      if (upper.contains(pair)) return pair;
+    }
+    // Commodities
+    if (upper.contains('GOLD') || upper.contains('XAU')) return 'XAUUSD';
+    if (upper.contains('SILVER') || upper.contains('XAG')) return 'XAGUSD';
+    if (upper.contains('OIL') || upper.contains('CRUDE')) return 'CRUDEOIL';
+    // Indices
+    if (upper.contains('S&P') || upper.contains('SPX') || upper.contains('SP500')) return 'SPX';
+    if (upper.contains('NASDAQ') || upper.contains('NDX')) return 'NDX';
+    if (upper.contains('DOW') || upper.contains('DJI')) return 'DJI';
+    // Crypto → Binance format (used by LiveCryptoChart)
+    if (upper.contains('BTC') || upper.contains('BITCOIN')) return 'BTCUSDT';
+    if (upper.contains('ETH') || upper.contains('ETHEREUM')) return 'ETHUSDT';
+    if (upper.contains('SOL')) return 'SOLUSDT';
+    if (upper.contains('BNB')) return 'BNBUSDT';
+    if (upper.contains('XRP')) return 'XRPUSDT';
+    // Fallback
+    return 'USDJPY';
+  }
+
   String _fmtDate(DateTime d) {
     const months = ['Jan','Feb','Mar','Apr','May','Jun',
       'Jul','Aug','Sep','Oct','Nov','Dec'];
@@ -642,9 +807,9 @@ class _DetailBodyState extends State<_DetailBody> {
   }
 
   // ── PINNED TAB BAR (extracted for SliverPersistentHeader) ────────
-  Widget _buildTabBar(BuildContext context) {
+  Widget _buildTabBar(BuildContext context, {Color? backgroundColor}) {
     return Container(
-      color: Theme.of(context).scaffoldBackgroundColor.withOpacity(0.99),
+      color: backgroundColor ?? Theme.of(context).scaffoldBackgroundColor,
       alignment: Alignment.centerLeft,
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Row(
@@ -703,6 +868,53 @@ class _DetailBodyState extends State<_DetailBody> {
 }
 
 // ══════════════════════════════════════════════════════════════════
+// BOOKMARK STAR — detail screen version (slightly larger)
+// Reads BookmarkViewModel from the parent provider tree (injected
+// at app root), so state is shared with HomeScreen cards.
+// ══════════════════════════════════════════════════════════════════
+class _DetailBookmarkStar extends StatelessWidget {
+  final String eventId;
+  const _DetailBookmarkStar({required this.eventId});
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<BookmarkViewModel>(
+      builder: (context, bVm, _) {
+        final bookmarked = bVm.isBookmarked(eventId);
+        final pending    = bVm.isPending(eventId);
+
+        return GestureDetector(
+          onTap: pending ? null : () => bVm.toggleBookmark(eventId),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: bookmarked
+                  ? const Color(0xFFF5A623).withValues(alpha: 0.15)
+                  : Colors.grey.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: pending
+                ? SizedBox(
+              width: 18, height: 18,
+              child: CircularProgressIndicator(
+                  strokeWidth: 1.5, color: Colors.grey.shade500),
+            )
+                : Icon(
+              bookmarked ? Icons.star : Icons.star_border,
+              size: 20,
+              color: bookmarked
+                  ? const Color(0xFFF5A623)
+                  : Colors.grey.shade500,
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════
 // PINNED TAB BAR DELEGATE
 // Keeps the Activity / Holders / Comments tab bar stuck to the top
 // of the screen while the user scrolls through content below it.
@@ -742,13 +954,15 @@ class _DetailOrderBook extends StatefulWidget {
   final SubMarket  subMarket;
   final EventModel event;
   final bool       readOnly;
+  final bool       lastEntryOnly; // true = single-market: show only last bid+ask
 
   const _DetailOrderBook({
     required this.book,
     required this.loading,
     required this.subMarket,
     required this.event,
-    this.readOnly = false,
+    this.readOnly      = false,
+    this.lastEntryOnly = false,
   });
 
   @override
@@ -834,12 +1048,27 @@ class _DetailOrderBookState extends State<_DetailOrderBook> {
       );
     }
 
-    double maxA = 1, maxB = 1;
-    for (final l in asks) if (l.shares > maxA) maxA = l.shares;
-    for (final l in bids) if (l.shares > maxB) maxB = l.shares;
+    // Single-market: show only best ask (lowest price) + best bid (highest price)
+    List<OrderBookLevel> shownAsks;
+    List<OrderBookLevel> shownBids;
 
-    final shownAsks = _showAllAsks ? asks : asks.take(_pageSize).toList();
-    final shownBids = _showAllBids ? bids : bids.take(_pageSize).toList();
+    if (widget.lastEntryOnly) {
+      // Best ask = lowest price ask
+      shownAsks = asks.isNotEmpty
+          ? [asks.reduce((a, b) => a.price < b.price ? a : b)]
+          : [];
+      // Best bid = highest price bid
+      shownBids = bids.isNotEmpty
+          ? [bids.reduce((a, b) => a.price > b.price ? a : b)]
+          : [];
+    } else {
+      shownAsks = _showAllAsks ? asks : asks.take(_pageSize).toList();
+      shownBids = _showAllBids ? bids : bids.take(_pageSize).toList();
+    }
+
+    double maxA = 1, maxB = 1;
+    for (final l in shownAsks) if (l.shares > maxA) maxA = l.shares;
+    for (final l in shownBids) if (l.shares > maxB) maxB = l.shares;
 
     return Column(children: [
       ...shownAsks.map((a) => GestureDetector(
@@ -849,7 +1078,7 @@ class _DetailOrderBookState extends State<_DetailOrderBook> {
             initialPrice: (a.price * 100).roundToDouble()),
         child: _askRow(a, maxA),
       )),
-      if (asks.length > _pageSize)
+      if (!widget.lastEntryOnly && asks.length > _pageSize)
         _moreBtn(showing: _showAllAsks, total: asks.length,
             onTap: () => setState(() => _showAllAsks = !_showAllAsks), isAsk: true),
       _spreadRow(book, divC),
@@ -860,7 +1089,7 @@ class _DetailOrderBookState extends State<_DetailOrderBook> {
             initialPrice: (b.price * 100).roundToDouble()),
         child: _bidRow(b, maxB),
       )),
-      if (bids.length > _pageSize)
+      if (!widget.lastEntryOnly && bids.length > _pageSize)
         _moreBtn(showing: _showAllBids, total: bids.length,
             onTap: () => setState(() => _showAllBids = !_showAllBids), isAsk: false),
     ]);

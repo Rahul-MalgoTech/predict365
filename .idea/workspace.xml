@@ -10,29 +10,29 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ef881180-111e-4c11-9554-3295fb13d7a5" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/lib/Models/ActivityModel.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/Models/BookmarkmodelSeeder.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/Models/ThoughtsModel.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/PredictScreens/PredictionDetailScreens/ActivityTab/ActivityTabView.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/PredictScreens/PredictionDetailScreens/CommentTab/CommentTabView.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/Repository/ActivityRepository.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/Repository/BookmarkRepository.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/Repository/ThoughtsRepository.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/Repository/WatchlistRepository.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/ViewModel/ActivityVM.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/ViewModel/BookmarkVM.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/ViewModel/ThoughtsVM.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/ViewModel/WatchlistVM.dart" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/lib/Models/CancelOrderModel.dart" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/lib/PredictScreens/HomeScreens/MarketTickData.dart" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/lib/PredictScreens/PredictionDetailScreens/Chart/LiveCryptoChart.dart" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/lib/PredictScreens/PredictionDetailScreens/Chart/LiveFinanceChart.dart" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/lib/PredictScreens/ProtfolioScreens/MarketTickerService.dart" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/lib/Repository/CancelOrderRepository.dart" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/lib/ViewModel/CancelOrderVM.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/caches/deviceStreaming.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/caches/deviceStreaming.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/APIService/Remote/network/NetworkApiService.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/APIService/Remote/network/NetworkApiService.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/android/local.properties" beforeDir="false" afterPath="$PROJECT_DIR$/android/local.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/Models/EventModel.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Models/EventModel.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/Models/UserModel.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Models/UserModel.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/PredictScreens/BottomNavScreen/BottomNavScreen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/PredictScreens/BottomNavScreen/BottomNavScreen.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/PredictScreens/HomeScreens/HomeView.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/PredictScreens/HomeScreens/HomeView.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/PredictScreens/PredictionDetailScreens/BuyScreens/BuyDrawerView.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/PredictScreens/PredictionDetailScreens/BuyScreens/BuyDrawerView.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/PredictScreens/PredictionDetailScreens/predictionDetailView.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/PredictScreens/PredictionDetailScreens/predictionDetailView.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/PredictScreens/ProfileScreens/profileView.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/PredictScreens/ProfileScreens/profileView.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/PredictScreens/ProtfolioScreens/portfolioView.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/PredictScreens/ProtfolioScreens/portfolioView.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/PredictScreens/WatchListScreens/watchlistView.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/PredictScreens/WatchListScreens/watchlistView.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/Predict_Utils/CustomSnackBar/StatusMessage.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Predict_Utils/CustomSnackBar/StatusMessage.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/Repository/EventRespository.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Repository/EventRespository.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/ViewModel/EventVM.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/ViewModel/EventVM.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/main.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/main.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/predict365.iml" beforeDir="false" afterPath="$PROJECT_DIR$/predict365.iml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -159,7 +159,15 @@
       <option name="project" value="LOCAL" />
       <updated>1773388511342</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="bookmark done">
+      <option name="closed" value="true" />
+      <created>1773401237007</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1773401237007</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -168,7 +176,8 @@
     <MESSAGE value="home,rank,refer ui" />
     <MESSAGE value="event api call" />
     <MESSAGE value="orderbook done" />
-    <option name="LAST_COMMIT_MESSAGE" value="orderbook done" />
+    <MESSAGE value="bookmark done" />
+    <option name="LAST_COMMIT_MESSAGE" value="bookmark done" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -177,6 +186,11 @@
           <url>file://$PROJECT_DIR$/lib/PredictScreens/BottomNavScreen/BottomNavScreen.dart</url>
           <line>9</line>
           <option name="timeStamp" value="2" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="Dart">
+          <url>file://$PROJECT_DIR$/lib/PredictScreens/ProtfolioScreens/portfolioView.dart</url>
+          <line>273</line>
+          <option name="timeStamp" value="3" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

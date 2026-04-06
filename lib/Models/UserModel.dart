@@ -66,7 +66,7 @@ class UserModel {
   double get totalBalance => wallet;
 
   /// Formatted balance string
-  String get balanceFormatted => '₹${totalBalance.toStringAsFixed(2)}';
+  String get balanceFormatted => '\$${totalBalance.toStringAsFixed(2)}';
 }
 
 class UserResponseModel {

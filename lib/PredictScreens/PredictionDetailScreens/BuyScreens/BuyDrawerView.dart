@@ -7,6 +7,7 @@ import 'package:predict365/Models/OrderBookModel.dart';
 import 'package:predict365/Models/OrderModel.dart';
 import 'package:predict365/Predict_Utils/App_Theme/App_Theme.dart';
 import 'package:predict365/Predict_Utils/ColorHandlers/AppColors.dart';
+import 'package:predict365/Predict_Utils/CustomSnackBar/StatusMessage.dart';
 import 'package:predict365/Repository/OrderRepository.dart';
 import 'package:predict365/ViewModel/UserVM.dart';
 import 'package:provider/provider.dart';
@@ -158,16 +159,17 @@ class _BuySheetState extends State<_BuySheet> {
       if (response.success) {
         FocusScope.of(context).unfocus();
         Navigator.pop(context);
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text(
-            'Order placed! Status: ${response.order?.status ?? 'ACKED'}',
-            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
-          ),
-          backgroundColor: Colors.green.shade700,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-          duration: const Duration(seconds: 2),
-        ));
+        Utils.snackBar('Order placed! Status: ${response.order?.status ?? 'ACKED'}',context);
+        // ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        //   content: Text(
+        //     'Order placed! Status: ${response.order?.status ?? 'ACKED'}',
+        //     style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+        //   ),
+        //   backgroundColor: Colors.green.shade700,
+        //   behavior: SnackBarBehavior.floating,
+        //   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        //   duration: const Duration(seconds: 2),
+        // ));
       } else {
         _showSnack(
           response.message.isNotEmpty ? response.message : 'Failed to place order.',
@@ -183,14 +185,7 @@ class _BuySheetState extends State<_BuySheet> {
   }
 
   void _showSnack(String msg, {required bool isError}) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: Text(msg,
-          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
-      backgroundColor: isError ? Colors.red.shade700 : Colors.green.shade700,
-      behavior: SnackBarBehavior.floating,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      duration: Duration(seconds: isError ? 3 : 2),
-    ));
+    isError?Utils.snackBarErrorMessage(msg,context):Utils.snackBar(msg,context);
   }
 
   String _friendlyError(String e) {
@@ -287,10 +282,12 @@ class _BuySheetState extends State<_BuySheet> {
                         maxLines: 1, overflow: TextOverflow.ellipsis),
                     const SizedBox(height: 2),
                     Row(children: [
-                      Text(widget.subMarket.name,
-                          style: TextStyle(
-                              fontSize: 12, color: Colors.grey.shade500),
-                          maxLines: 1, overflow: TextOverflow.ellipsis),
+                      Expanded(
+                        child: Text(widget.subMarket.name,
+                            style: TextStyle(
+                                fontSize: 12, color: Colors.grey.shade500),
+                            maxLines: 1, overflow: TextOverflow.ellipsis),
+                      ),
                       const SizedBox(width: 8),
                       // Yes / No pill
                       GestureDetector(

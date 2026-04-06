@@ -16,7 +16,8 @@ import 'package:predict365/ViewModel/UserVM.dart';
 import 'package:provider/provider.dart';
 
 class ProfileScreen extends StatefulWidget {
-  const ProfileScreen({super.key});
+  final bool nav;
+  const ProfileScreen({super.key, required this.nav});
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
@@ -101,6 +102,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       child: Row(
                         children: [
                           // Avatar
+                          widget.nav == true?GestureDetector(
+                            onTap: (){
+                              predictNavigator.backPage(context);
+                            },
+
+                              child: Container(
+
+                                decoration: BoxDecoration(color: theme.primaryColorDark,
+                                borderRadius: BorderRadius.circular(6),
+                                  border: Border.all(color: theme.dividerColor),
+                                ),
+
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(left: 8.0,top: 6,bottom: 6),
+                                    child: Icon(Icons.arrow_back_ios),
+                                  ))):SizedBox(),
+                          SizedBox(width: 10,),
                           CircleAvatar(
                             radius: 30,
                             backgroundImage: (profileImage != null && profileImage.isNotEmpty)

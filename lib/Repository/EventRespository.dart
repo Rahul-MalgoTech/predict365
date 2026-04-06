@@ -9,7 +9,7 @@ class EventRepository {
 
   /// GET https://staging-api.predict365.com/api/events
   Future<EventsResponseModel> getEvents() async {
-    final response = await _apiService.getResponse('events');
+    final response = await _apiService.getResponse('events/home');
 
     if (kDebugMode) {
       final eventsRaw = response['events'];

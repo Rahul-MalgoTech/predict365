@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:predict365/Models/EventModel.dart';
 import 'package:predict365/PredictScreens/DepositWithdrawScreen/DepositWithdrawScreen.dart';
+import 'package:predict365/PredictScreens/HomeScreens/MarketTickData.dart';
 import 'package:predict365/PredictScreens/HomeScreens/SearchView.dart';
 import 'package:predict365/PredictScreens/MatchScreens/matchView.dart';
 import 'package:predict365/PredictScreens/PredictionDetailScreens/predictionDetailView.dart';
+import 'package:predict365/PredictScreens/ProfileScreens/profileView.dart';
 import 'package:predict365/Predict_Utils/App_Theme/App_Theme.dart';
 import 'package:predict365/Reusable_Widgets/AppText_Theme/AppText_Theme.dart';
 import 'package:predict365/Reusable_Widgets/BondingNavigator.dart';
@@ -29,7 +31,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    _loadData();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _loadData());
   }
 
   Future<void> _loadData() async {
@@ -99,12 +101,17 @@ class _HomeScreenState extends State<HomeScreen> {
                       Icon(Icons.notifications_none,
                           color: Theme.of(context).iconTheme.color, size: 20),
                       const SizedBox(width: 8),
-                      CircleAvatar(
-                        radius: 14,
-                        backgroundImage: (user?.profileImage != null &&
-                            user!.profileImage!.isNotEmpty)
-                            ? NetworkImage(user.profileImage!) as ImageProvider
-                            : const AssetImage("assets/images/myprofile.png"),
+                      GestureDetector(
+                        onTap: (){
+                          predictNavigator.newPage(context, page: ProfileScreen(nav: true,));
+                        },
+                        child: CircleAvatar(
+                          radius: 14,
+                          backgroundImage: (user?.profileImage != null &&
+                              user!.profileImage!.isNotEmpty)
+                              ? NetworkImage(user.profileImage!) as ImageProvider
+                              : const AssetImage("assets/images/myprofile.png"),
+                        ),
                       ),
                     ],
                   );
@@ -165,32 +172,32 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: Column(
                       children: [
                         // ── Quick Cards ──
-                        Padding(
-                          padding: const EdgeInsets.fromLTRB(12, 8, 12, 0),
-                          child: Column(
-                            children: [
-                              Row(
-                                children: const [
-                                  Expanded(child: QuickCard("BTC/USDT", "LIVE", logo: 'assets/images/paircoin.png')),
-                                  SizedBox(width: 8),
-                                  Expanded(child: QuickCard("Youtube",  "Hot",  logo: 'assets/images/youtubelogo.png')),
-                                  SizedBox(width: 8),
-                                  Expanded(child: QuickCard("15 M",     "",     logo: 'assets/images/bitcoin.png')),
-                                ],
-                              ),
-                              const SizedBox(height: 14),
-                              Row(
-                                children: const [
-                                  Expanded(child: QuickCard("T20 WC",  "", logo: 'assets/images/circket.png')),
-                                  SizedBox(width: 8),
-                                  Expanded(child: QuickCard("Football","", logo: 'assets/images/game.png')),
-                                  SizedBox(width: 8),
-                                  Expanded(child: QuickCard("Gold",    "", logo: 'assets/images/gold.png')),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
+                        // Padding(
+                        //   padding: const EdgeInsets.fromLTRB(12, 8, 12, 0),
+                        //   child: Column(
+                        //     children: [
+                        //       Row(
+                        //         children: const [
+                        //           Expanded(child: QuickCard("BTC/USDT", "LIVE", logo: 'assets/images/paircoin.png')),
+                        //           SizedBox(width: 8),
+                        //           Expanded(child: QuickCard("Youtube",  "Hot",  logo: 'assets/images/youtubelogo.png')),
+                        //           SizedBox(width: 8),
+                        //           Expanded(child: QuickCard("15 M",     "",     logo: 'assets/images/bitcoin.png')),
+                        //         ],
+                        //       ),
+                        //       const SizedBox(height: 14),
+                        //       Row(
+                        //         children: const [
+                        //           Expanded(child: QuickCard("T20 WC",  "", logo: 'assets/images/circket.png')),
+                        //           SizedBox(width: 8),
+                        //           Expanded(child: QuickCard("Football","", logo: 'assets/images/game.png')),
+                        //           SizedBox(width: 8),
+                        //           Expanded(child: QuickCard("Gold",    "", logo: 'assets/images/gold.png')),
+                        //         ],
+                        //       ),
+                        //     ],
+                        //   ),
+                        // ),
 
                         const SizedBox(height: 16),
 
@@ -507,101 +514,144 @@ class SingleMarketCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final m = event.primaryMarket;
 
-    return GestureDetector(
-      onTap: () => predictNavigator.newPage(
-          context, page: PredikDetailScreen(eventId: event.id)),
-      child: Container(
-        padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(
-          color: Theme.of(context).primaryColorDark,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Theme.of(context).dividerColor),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.06),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
+    return Consumer<MarketTickerService>(
+      builder: (context, ticker, _) {
+        // Use primary market's live tick; fall back gracefully if not yet received
+        final primaryMarketId = m?.id;
+        final tick = primaryMarketId != null
+            ? ticker.getMarketData(primaryMarketId)
+            : null;
 
-            // ── Title row ──
-            Row(
+        // YES% from live bestBid, fallback to lastTradedSide1Price, then 50
+        final yesPercent = tick?.yesPercent
+            ?? ((m?.lastTradedSide1Price ?? 0.5) * 100);
+        final noPercent  = 100 - yesPercent;
+
+        final yesPrice = tick?.yesPriceLabel
+            ?? (m?.lastTradedSide1Price != null
+                ? '${(m!.lastTradedSide1Price! * 100).toStringAsFixed(0)}¢'
+                : '');
+        final noPrice  = tick?.noPriceLabel
+            ?? (m?.lastTradedSide1Price != null
+                ? '${((1 - m!.lastTradedSide1Price!) * 100).toStringAsFixed(0)}¢'
+                : '');
+
+        // Live volume > 0 overrides static totalPoolInUsd
+        final liveVol  = tick?.volume ?? 0;
+        final volLabel = liveVol > 0
+            ? tick!.volumeLabel
+            : '\$${event.totalPoolInUsd.toStringAsFixed(2)} Vol';
+
+        return GestureDetector(
+          onTap: () => predictNavigator.newPage(
+              context, page: PredikDetailScreen(eventId: event.id)),
+          child: Container(
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              color: Theme.of(context).primaryColorDark,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Theme.of(context).dividerColor),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.06),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Expanded(
-                  child: AppText(
-                    event.eventTitle,
-                    fontSize: 15,
-                    fontWeight: FontWeight.w600,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
+
+                // ── Title row ──
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: AppText(
+                        event.eventTitle,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    _BookmarkStar(eventId: event.id),
+                    const SizedBox(width: 6),
+                    _iconBtn(Icons.access_time_outlined),
+                  ],
+                ),
+
+                const SizedBox(height: 14),
+
+                // ── YES / NO percentages (live) ──
+                Row(
+                  children: [
+                    AppText('${yesPercent.toStringAsFixed(0)}%',
+                        fontSize: 15, fontWeight: FontWeight.w600),
+                    const SizedBox(width: 6),
+                    AppText(event.side1Label,
+                        fontSize: 14, color: Colors.green, fontWeight: FontWeight.w500),
+                    const Spacer(),
+                    AppText(event.side2Label,
+                        fontSize: 14, color: Colors.red, fontWeight: FontWeight.w500),
+                    const SizedBox(width: 6),
+                    AppText('${noPercent.toStringAsFixed(0)}%',
+                        fontSize: 15, fontWeight: FontWeight.w600),
+                  ],
+                ),
+
+                const SizedBox(height: 8),
+
+                // ── Progress bar (live) ──
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(4),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        flex: yesPercent.round().clamp(1, 99),
+                        child: Container(height: 5, color: Colors.green),
+                      ),
+                      Expanded(
+                        flex: noPercent.round().clamp(1, 99),
+                        child: Container(height: 5, color: Colors.red),
+                      ),
+                    ],
                   ),
                 ),
-                const SizedBox(width: 8),
-                // ★ Bookmark star — calls API on tap
-                _BookmarkStar(eventId: event.id),
-                const SizedBox(width: 6),
-                _iconBtn(Icons.access_time_outlined),
+
+                const SizedBox(height: 14),
+
+                // ── Bet buttons (live prices) ──
+                Row(
+                  children: [
+                    Expanded(child: _betButton(context, event.side1Label, yesPrice, Colors.green)),
+                    const SizedBox(width: 10),
+                    Expanded(child: _betButton(context, event.side2Label, noPrice,  Colors.red)),
+                  ],
+                ),
+
+                const SizedBox(height: 14),
+
+                // ── Footer (live volume) ──
+                Row(
+                  children: [
+                    AppText(volLabel, fontSize: 13, color: Colors.grey),
+                    const Spacer(),
+                    AppText(
+                        event.hasSubMarkets
+                            ? '${event.subMarkets.length} Market${event.subMarkets.length == 1 ? '' : 's'}'
+                            : '1 Market',
+                        // '${event.subMarkets.length} Market${event.subMarkets.length == 1 ? '' : 's'}',
+                        fontSize: 13, color: Colors.grey),
+                  ],
+                ),
               ],
             ),
-
-            const SizedBox(height: 14),
-
-            Row(
-              children: [
-                AppText("48%", fontSize: 15, fontWeight: FontWeight.w600),
-                const SizedBox(width: 6),
-                AppText(m?.side1 ?? 'Yes',
-                    fontSize: 14, color: Colors.green, fontWeight: FontWeight.w500),
-                const Spacer(),
-                AppText(m?.side2 ?? 'No',
-                    fontSize: 14, color: Colors.red, fontWeight: FontWeight.w500),
-                const SizedBox(width: 6),
-                AppText("52%", fontSize: 15, fontWeight: FontWeight.w600),
-              ],
-            ),
-
-            const SizedBox(height: 8),
-
-            ClipRRect(
-              borderRadius: BorderRadius.circular(4),
-              child: Row(
-                children: [
-                  Expanded(flex: 48, child: Container(height: 5, color: Colors.green)),
-                  Expanded(flex: 52, child: Container(height: 5, color: Colors.red)),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 14),
-
-            Row(
-              children: [
-                Expanded(child: _betButton(context, m?.side1 ?? 'Yes', '49¢', Colors.green)),
-                const SizedBox(width: 10),
-                Expanded(child: _betButton(context, m?.side2 ?? 'No',  '53¢', Colors.red)),
-              ],
-            ),
-
-            const SizedBox(height: 14),
-
-            Row(
-              children: [
-                AppText('\$ ${event.totalPoolInUsd.toStringAsFixed(0)} Vol',
-                    fontSize: 13, color: Colors.grey),
-                const Spacer(),
-                AppText(
-                    '${event.subMarkets.length} Market${event.subMarkets.length == 1 ? '' : 's'}',
-                    fontSize: 13, color: Colors.grey),
-              ],
-            ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 
@@ -636,86 +686,110 @@ class MultiMarketCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () => predictNavigator.newPage(
-          context, page: PredikDetailScreen(eventId: event.id)),
-      child: Container(
-        padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(
-          color: Theme.of(context).primaryColorDark,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Theme.of(context).dividerColor),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.06),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
+    return Consumer<MarketTickerService>(
+      builder: (context, ticker, _) {
+        // Aggregate volume across all sub-markets from live ticks
+        double liveVol = 0;
+        for (final m in event.subMarkets) {
+          liveVol += ticker.getMarketData(m.id)?.volume ?? 0;
+        }
+        final volLabel = liveVol > 0
+            ? _formatVolume(liveVol)
+            : '\$${event.totalPoolInUsd.toStringAsFixed(2)} Vol';
 
-            // ── Title row ──
-            Row(
+        return GestureDetector(
+          onTap: () => predictNavigator.newPage(
+              context, page: PredikDetailScreen(eventId: event.id)),
+          child: Container(
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              color: Theme.of(context).primaryColorDark,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Theme.of(context).dividerColor),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.06),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Expanded(
-                  child: AppText(
-                    event.eventTitle,
-                    fontSize: 15,
-                    fontWeight: FontWeight.w600,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
+
+                // ── Title row ──
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: AppText(
+                        event.eventTitle,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    _BookmarkStar(eventId: event.id),
+                    const SizedBox(width: 6),
+                    _iconBtn(Icons.access_time_outlined),
+                  ],
                 ),
-                const SizedBox(width: 8),
-                // ★ Bookmark star — calls API on tap
-                _BookmarkStar(eventId: event.id),
-                const SizedBox(width: 6),
-                _iconBtn(Icons.access_time_outlined),
+
+                const SizedBox(height: 14),
+
+                // ── Sub-market rows — live YES/NO prices ──
+                ...event.subMarkets.take(3).map((m) {
+                  final tick = ticker.getMarketData(m.id);
+                  final yesLabel = tick?.yesPriceLabel
+                      ?? (m.lastTradedSide1Price != null
+                          ? '${(m.lastTradedSide1Price! * 100).toStringAsFixed(0)}¢'
+                          : '--');
+                  final noLabel  = tick?.noPriceLabel
+                      ?? (m.lastTradedSide1Price != null
+                          ? '${((1 - m.lastTradedSide1Price!) * 100).toStringAsFixed(0)}¢'
+                          : '--');
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 10),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: AppText(m.name,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w400,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis),
+                        ),
+                        const SizedBox(width: 8),
+                        _betBtn(context, '${m.side1.isNotEmpty ? m.side1 : event.side1Label} $yesLabel', Colors.green),
+                        const SizedBox(width: 6),
+                        _betBtn(context, '${m.side2.isNotEmpty ? m.side2 : event.side2Label} $noLabel',  Colors.red),
+                      ],
+                    ),
+                  );
+                }),
+
+                const SizedBox(height: 4),
+                Divider(color: Theme.of(context).dividerColor, thickness: 1),
+                const SizedBox(height: 8),
+
+                // ── Footer (live aggregate volume) ──
+                Row(
+                  children: [
+                    AppText(volLabel, fontSize: 13, color: Colors.grey),
+                    const Spacer(),
+                    AppText(
+                        '${event.subMarkets.length} Market${event.subMarkets.length == 1 ? '' : 's'}',
+                        fontSize: 13, color: Colors.grey),
+                  ],
+                ),
               ],
             ),
-
-            const SizedBox(height: 14),
-
-            ...event.subMarkets.take(3).map((m) => Padding(
-              padding: const EdgeInsets.only(bottom: 10),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: AppText(m.name,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w400,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis),
-                  ),
-                  const SizedBox(width: 8),
-                  _betBtn(context, m.side1, Colors.green),
-                  const SizedBox(width: 6),
-                  _betBtn(context, m.side2, Colors.red),
-                ],
-              ),
-            )),
-
-            const SizedBox(height: 4),
-            Divider(color: Theme.of(context).dividerColor, thickness: 1),
-            const SizedBox(height: 8),
-
-            Row(
-              children: [
-                AppText('\$ ${event.totalPoolInUsd.toStringAsFixed(0)} Vol',
-                    fontSize: 13, color: Colors.grey),
-                const Spacer(),
-                AppText(
-                    '${event.subMarkets.length} Market${event.subMarkets.length == 1 ? '' : 's'}',
-                    fontSize: 13, color: Colors.grey),
-              ],
-            ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 
@@ -727,6 +801,12 @@ class MultiMarketCard extends StatelessWidget {
     ),
     child: Icon(icon, size: 16, color: Colors.grey),
   );
+
+  String _formatVolume(double v) {
+    if (v >= 1000000) return '\$${(v / 1000000).toStringAsFixed(1)}M Vol';
+    if (v >= 1000)    return '\$${(v / 1000).toStringAsFixed(1)}K Vol';
+    return '\$${v.toStringAsFixed(2)} Vol';
+  }
 
   Widget _betBtn(BuildContext context, String label, Color color) => Container(
     padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
